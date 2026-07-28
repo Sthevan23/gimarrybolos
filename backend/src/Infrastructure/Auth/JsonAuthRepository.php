@@ -39,6 +39,6 @@ final class JsonAuthRepository implements AuthRepositoryInterface
 
     public function getEmail(): string
     {
-        return (string) (($this->store->read()['auth']['email'] ?? 'admin@gimarry.com.br'));
+        return (string) (($this->store->read()['auth']['email'] ?? 'admin@sthevandev.com.br'));
     }
 }

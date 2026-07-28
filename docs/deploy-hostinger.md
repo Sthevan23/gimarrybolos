@@ -69,7 +69,7 @@ Se a API for subdomínio (`api.gimarrybolos.com.br`), configure CORS e cookies `
 
 ## 5. Conta admin padrão
 
-- E-mail: `admin@gimarry.com.br`
+- E-mail: `admin@sthevandev.com.br`
 - Senha: `admin123`  
 **Troque no painel** após o primeiro login.
 

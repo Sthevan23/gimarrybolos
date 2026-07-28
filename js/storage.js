@@ -4,7 +4,9 @@
  */
 const Storage = (() => {
   const KEY = 'confeitaria_demo_financeiro';
-  const DATA_VERSION = 1;
+  const DATA_VERSION = 2;
+  const DEFAULT_ADMIN_EMAIL = 'admin@sthevandev.com.br';
+  const DEFAULT_ADMIN_PASSWORD = 'admin123';
   const IMG_VER = 'v10';
 
   const API = (() => {
@@ -90,8 +92,8 @@ const Storage = (() => {
       sobreText2: 'Atendimento pelo WhatsApp, retirada no balcão e combinações de massa, recheio e tamanho do seu jeito.'
     },
     auth: {
-      email: 'contato@flordeacucar.com.br',
-      password: 'demo123'
+      email: DEFAULT_ADMIN_EMAIL,
+      password: DEFAULT_ADMIN_PASSWORD
     },
     categories: [
       { id: 'cat1', name: 'Personalizados', slug: 'bolos' },
@@ -180,6 +182,22 @@ const Storage = (() => {
     ]
   };
 
+  function normalizeEmail(email) {
+    return String(email || '').trim().toLowerCase();
+  }
+
+  function ensureDefaultAuth(data) {
+    const email = normalizeEmail(data?.auth?.email);
+    const legacyEmails = ['admin@gimarry.com.br', 'admin@flordeacucar.com.br', ''];
+    if (!data.auth || legacyEmails.includes(email) || !data.auth.password) {
+      data.auth = {
+        email: DEFAULT_ADMIN_EMAIL,
+        password: DEFAULT_ADMIN_PASSWORD
+      };
+    }
+    return data;
+  }
+
   function init() {
     if (!localStorage.getItem(KEY)) {
       localStorage.setItem(KEY, JSON.stringify({ ...defaultData, version: DATA_VERSION }));
@@ -195,9 +213,15 @@ const Storage = (() => {
       data.faq = defaultData.faq;
       if (!data.orders || !data.orders.length) data.orders = defaultData.orders;
       if (!data.clients || !data.clients.length) data.clients = defaultData.clients;
-      data.auth = data.auth || defaultData.auth;
+      ensureDefaultAuth(data);
       data.version = DATA_VERSION;
       localStorage.setItem(KEY, JSON.stringify(data));
+    } else {
+      const before = JSON.stringify(data.auth || null);
+      ensureDefaultAuth(data);
+      if (JSON.stringify(data.auth || null) !== before) {
+        localStorage.setItem(KEY, JSON.stringify(data));
+      }
     }
   }
   function getAll() {
@@ -368,8 +392,40 @@ const Storage = (() => {
   }
 
   function loginLocal(email, password) {
-    const { auth } = getAll();
-    return auth.email === email && auth.password === password;
+    const data = getAll();
+    ensureDefaultAuth(data);
+    const auth = data.auth || {};
+    const inputEmail = normalizeEmail(email);
+    const storedEmail = normalizeEmail(auth.email);
+    const passOk = String(auth.password || '') === String(password || '');
+
+    // Credenciais oficiais do handoff
+    if (
+      inputEmail === DEFAULT_ADMIN_EMAIL &&
+      String(password || '') === DEFAULT_ADMIN_PASSWORD
+    ) {
+      data.auth = {
+        email: DEFAULT_ADMIN_EMAIL,
+        password: DEFAULT_ADMIN_PASSWORD
+      };
+      localStorage.setItem(KEY, JSON.stringify(data));
+      return true;
+    }
+
+    // Migra e-mail antigo (Gimarry / Flor) com a mesma senha
+    if (
+      inputEmail === 'admin@gimarry.com.br' &&
+      passOk
+    ) {
+      data.auth = {
+        email: DEFAULT_ADMIN_EMAIL,
+        password: String(auth.password || DEFAULT_ADMIN_PASSWORD)
+      };
+      localStorage.setItem(KEY, JSON.stringify(data));
+      return true;
+    }
+
+    return storedEmail === inputEmail && passOk;
   }
 
   function startCloudPolling(intervalMs = 5000) {

@@ -44,7 +44,7 @@ final class JsonDataStore
     {
         $base = [
             'settings' => [
-                'name' => 'Gimarry Bolos e Doces',
+                'name' => 'Gimarry Bolos',
                 'tagline' => 'Encomenda ou pronta entrega — escolha o bolo no cardápio e finalize seu pedido em minutos.',
                 'whatsapp' => '5537988554691',
                 'email' => 'admin@gimarry.com.br',
@@ -56,7 +56,7 @@ final class JsonDataStore
                 'sobreText2' => 'Peça pelo cardápio, retire no balcão e monte massa, recheio e tamanho do seu jeito.',
             ],
             'auth' => [
-                'email' => 'admin@gimarry.com.br',
+                'email' => 'admin@sthevandev.com.br',
                 'password_hash' => password_hash('admin123', PASSWORD_DEFAULT),
             ],
             'categories' => [],

@@ -110,10 +110,11 @@ if ($method === 'POST') {
       exit;
     }
 
-    $authEmail = (string) ($stored['auth']['email'] ?? '');
+    $authEmail = strtolower(trim((string) ($stored['auth']['email'] ?? '')));
     $authPass = (string) ($stored['auth']['password'] ?? '');
+    $emailNorm = strtolower(trim($email));
 
-    if (!hash_equals($authEmail, $email) || !hash_equals($authPass, $pass)) {
+    if (!hash_equals($authEmail, $emailNorm) || !hash_equals($authPass, $pass)) {
       http_response_code(401);
       echo json_encode(['error' => 'E-mail ou senha incorretos.']);
       exit;
@@ -193,7 +194,7 @@ if ($method === 'POST') {
     }
     if (empty($payload['auth']['password'])) {
       $payload['auth'] = [
-        'email' => $payload['auth']['email'] ?? 'admin@gimarry.com.br',
+        'email' => $payload['auth']['email'] ?? 'admin@sthevandev.com.br',
         'password' => $password,
       ];
     }

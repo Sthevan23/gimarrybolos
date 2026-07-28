@@ -40,7 +40,7 @@ cd frontend && npm run sync
 ## Admin
 
 - URL: `/admin/login.html`
-- Padrão: `admin@gimarry.com.br` / `admin123`
+- Padrão: `admin@sthevandev.com.br` / `admin123`
 
 ## Deploy
 

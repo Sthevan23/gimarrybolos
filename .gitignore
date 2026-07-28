@@ -1,0 +1,4 @@
+node_modules/
+.preview/
+backend/config/.env.hostinger
+api/CONEXAO_HOSTINGER.txt
