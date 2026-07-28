@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=29">
+  <link rel="stylesheet" href="style.css?v=36">
 </head>
 <body>
   <header class="header" id="header">
@@ -26,7 +26,6 @@
         <a href="#produtos">Cardápio</a>
         <a href="#galeria">Galeria</a>
         <a href="#encomendas">Encomendas</a>
-        <a href="#incluso">Incluso</a>
         <a href="#contato">Contato</a>
       </nav>
       <a class="header__cart header__cart--link" href="cart.html" id="cart-open" aria-label="Abrir carrinho">
@@ -53,10 +52,15 @@
         </span>
 
         <h1 class="hero__title">
-          <span id="hero-tagline">Feito com amor para deixar seu dia mais</span>
-          <span class="hero__words" id="hero-words" aria-hidden="true"></span>
-          <span class="sr-only" id="hero-word-sr">doce</span>
+          <span class="hero__title-line" id="hero-title-line-1">Bolos artesanais feitos com carinho</span>
+          <span class="hero__title-line hero__title-line--dynamic">
+            <span id="hero-title-line-2">para deixar seu momento mais</span>
+            <span class="hero__words" id="hero-words" aria-hidden="true"></span>
+            <span class="sr-only" id="hero-word-sr">doce</span>
+          </span>
         </h1>
+
+        <p class="hero__lead" id="hero-lead">Escolha no cardápio, monte seu pedido e finalize pelo WhatsApp.</p>
 
         <p class="hero__place">
           <span id="hero-categories">Bolos · Copos · Cookies · Potes</span>
@@ -79,7 +83,7 @@
     <section class="section about" id="sobre">
       <div class="container about__grid">
         <div class="about__media reveal">
-          <img src="" alt="Doces da Gimarry Bolos" id="sobre-image">
+          <img src="" alt="Foto da loja Gimarry Bolos" id="sobre-image">
         </div>
         <div class="about__copy">
           <p class="section__eyebrow">Nossa história</p>
@@ -112,6 +116,10 @@
         </div>
         <div class="products__filter" id="category-filter"></div>
         <div class="products__grid" id="products-grid"></div>
+        <div class="products__actions" id="products-actions" hidden>
+          <button type="button" class="btn btn--ghost products__more" id="products-more">Ver mais 9 bolos</button>
+          <button type="button" class="btn btn--ghost products__more" id="products-collapse" hidden>Recolher</button>
+        </div>
       </div>
     </section>
 
@@ -123,6 +131,9 @@
           <p class="section__lead">Fotos reais da confeitaria — no seu site, entram as suas.</p>
         </div>
         <div class="gallery__grid" id="gallery-grid"></div>
+        <div class="products__actions" id="gallery-actions" hidden>
+          <button type="button" class="btn btn--ghost products__more" id="gallery-toggle">Ver mais fotos</button>
+        </div>
       </div>
     </section>
 
@@ -154,57 +165,11 @@
           <li>
             <span>03</span>
             <div>
-              <h3>Retirada ou entrega</h3>
-              <p id="order-pickup">Retire no endereço da casa ou peça entrega. Taxa e bairros configuráveis.</p>
+              <h3>Retirada no local</h3>
+              <p id="order-pickup">Retire no endereço da casa com atendimento combinado pelo WhatsApp.</p>
             </div>
           </li>
         </ol>
-      </div>
-    </section>
-
-    <section class="section features" id="incluso">
-      <div class="container">
-        <div class="features__intro">
-          <p class="section__eyebrow">Tudo no site</p>
-          <h2 class="section__title">O que você <em>encontra</em> aqui</h2>
-          <p class="section__lead">Cardápio digital, carrinho organizado e pedido simples — feito para confeitaria artesanal.</p>
-        </div>
-        <div class="features__grid">
-          <article class="feature-card">
-            <i class="fa-solid fa-store" aria-hidden="true"></i>
-            <h3>Marca da casa</h3>
-            <p>Visual próprio, textos e fotos da confeitaria.</p>
-          </article>
-          <article class="feature-card">
-            <i class="fa-solid fa-utensils" aria-hidden="true"></i>
-            <h3>Cardápio digital</h3>
-            <p>Categorias, sabores, promoções e mais vendidos em destaque.</p>
-          </article>
-          <article class="feature-card">
-            <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
-            <h3>Carrinho fácil</h3>
-            <p>Pedido organizado, com retirada ou entrega.</p>
-          </article>
-          <article class="feature-card">
-            <i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>
-            <h3>Pronto pro celular</h3>
-            <p>Layout pensado para quem pede pelo celular.</p>
-          </article>
-          <article class="feature-card">
-            <i class="fa-solid fa-images" aria-hidden="true"></i>
-            <h3>Galeria &amp; história</h3>
-            <p>Seção sobre, galeria e formulário de contato.</p>
-          </article>
-          <article class="feature-card">
-            <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
-            <h3>Painel admin</h3>
-            <p>Gerencie produtos, pedidos e configurações.</p>
-          </article>
-        </div>
-        <div class="features__cta">
-          <a class="btn btn--primary" href="#produtos">Ver o cardápio</a>
-          <a class="btn btn--ghost" href="#contato">Falar conosco</a>
-        </div>
       </div>
     </section>
 
@@ -236,16 +201,9 @@
               <span>
                 <small>Retirada</small>
                 <strong id="contact-address-text">Rua Exemplo, 100 · Centro</strong>
+                <em>Abrir no Google Maps</em>
               </span>
             </a>
-            <div class="contact__delivery">
-              <i class="fa-solid fa-motorcycle" aria-hidden="true"></i>
-              <span>
-                <small>Entrega</small>
-                <strong id="contact-delivery-fee">Valores sob consulta — região central</strong>
-                <em id="contact-delivery-note">Taxa e valores sob consulta no WhatsApp</em>
-              </span>
-            </div>
           </div>
         </aside>
       </div>
@@ -263,16 +221,20 @@
       </div>
 
       <nav class="footer__nav" aria-label="Rodapé">
+        <p class="footer__heading">Navegação</p>
         <a href="#produtos">Cardápio</a>
         <a href="#mais-vendidos">Mais vendidos</a>
-        <a href="#incluso">Incluso</a>
         <a href="#contato">Contato</a>
       </nav>
 
       <div class="footer__channels">
+        <p class="footer__heading">Retirada</p>
         <a id="footer-place" href="#" target="_blank" rel="noopener">
           <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-          <span id="footer-address">Rua Exemplo, 100</span>
+          <span>
+            <span id="footer-address">Rua Exemplo, 100</span>
+            <small class="footer__map-link">Abrir no Google Maps</small>
+          </span>
         </a>
       </div>
     </div>
@@ -280,7 +242,7 @@
     <div class="footer__bottom">
       <div class="container footer__bottom-inner">
         <p>© <span id="footer-year"></span> <span id="footer-copy-name">Gimarry Bolos</span></p>
-        <p>Retirada ou entrega · Pedidos pelo site</p>
+        <p>Retirada no local · Pedidos pelo site</p>
       </div>
     </div>
   </footer>
@@ -307,27 +269,8 @@
           <strong id="cart-total">R$ 0,00</strong>
         </div>
         <div class="cart-checkout" id="cart-checkout" hidden>
-          <p class="cart-checkout__label">Como prefere receber?</p>
-          <div class="fulfillment" role="radiogroup" aria-label="Entrega ou retirada">
-            <label class="fulfillment__option">
-              <input type="radio" name="cart-fulfillment" value="retirada" id="cart-fulfillment-retirada" checked>
-              <span>
-                <strong>Retirada</strong>
-                <small>Buscar no local</small>
-              </span>
-            </label>
-            <label class="fulfillment__option">
-              <input type="radio" name="cart-fulfillment" value="entrega" id="cart-fulfillment-entrega">
-              <span>
-                <strong>Entrega</strong>
-                <small id="delivery-fee-label" data-delivery-fee-label>Taxa sob consulta</small>
-              </span>
-            </label>
-          </div>
-          <p class="cart-drawer__delivery" id="cart-delivery-note" hidden>
-            Entrega: <strong id="cart-delivery-fee-text">sob consulta</strong> · valores confirmados no WhatsApp
-          </p>
-          <p class="cart-drawer__delivery cart-drawer__delivery--pickup" id="cart-pickup-note" hidden>
+          <p class="cart-checkout__label">Retirada</p>
+          <p class="cart-drawer__delivery cart-drawer__delivery--pickup" id="cart-pickup-note">
             Retirada em <strong id="cart-pickup-address">Rua Exemplo, 100</strong>
           </p>
           <p class="cart-checkout__label">Dados para finalizar</p>
@@ -350,7 +293,7 @@
 
   <div class="order-lightbox" id="order-lightbox" hidden>
     <button type="button" class="order-lightbox__backdrop" id="lightbox-backdrop" aria-label="Fechar"></button>
-    <div class="order-lightbox__panel">
+    <div class="order-lightbox__panel order-lightbox__panel--product">
       <div class="order-lightbox__handle" aria-hidden="true"></div>
       <button type="button" class="order-lightbox__close" id="lightbox-close" aria-label="Fechar">×</button>
       <div class="order-lightbox__media">
@@ -392,8 +335,8 @@
 
   <div class="cart-feedback" id="cart-feedback" hidden aria-live="polite"></div>
 
-  <script src="js/data.js?v=26"></script>
-  <script src="js/cart-shared.js?v=25"></script>
-  <script src="script.js?v=27"></script>
+  <script src="js/data.js?v=28"></script>
+  <script src="js/cart-shared.js?v=26"></script>
+  <script src="script.js?v=34"></script>
 </body>
 </html>

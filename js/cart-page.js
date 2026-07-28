@@ -191,7 +191,6 @@
   }
 
   function renderSummary() {
-    const mode = Cart.getFulfillment();
     const subtotal = Cart.subtotal();
     const total = Cart.payable();
 
@@ -205,22 +204,11 @@
     setText('cart-page-fee', 'Sob consulta');
 
     const discountRow = document.getElementById('cart-page-discount-row');
+    if (discountRow) discountRow.hidden = true;
     const feeRow = document.getElementById('cart-page-fee-row');
     const feeNote = document.getElementById('cart-page-fee-note');
-    const deliveryLabel = document.getElementById('cart-page-delivery-label');
-
-    if (discountRow) discountRow.hidden = true;
-
-    if (feeRow) feeRow.hidden = mode !== 'entrega';
-    if (feeNote) {
-      if (mode === 'entrega') {
-        feeNote.hidden = false;
-        feeNote.textContent = `Entrega: taxa sob consulta · ${Cart.getDeliveryNote()}`;
-      } else {
-        feeNote.hidden = true;
-      }
-    }
-    if (deliveryLabel) deliveryLabel.textContent = 'Taxa sob consulta';
+    if (feeRow) feeRow.hidden = true;
+    if (feeNote) feeNote.hidden = true;
 
     const couponBox = document.getElementById('cart-page-coupon');
     if (couponBox) couponBox.hidden = true;
@@ -243,11 +231,7 @@
       phone.value = c.phone ? formatPhoneBR(c.phone) : '';
       bindPhoneMask(phone);
     }
-    const mode = Cart.getFulfillment();
-    const ret = document.getElementById('cart-page-fulfillment-retirada');
-    const ent = document.getElementById('cart-page-fulfillment-entrega');
-    if (ret) ret.checked = mode === 'retirada';
-    if (ent) ent.checked = mode === 'entrega';
+    Cart.setFulfillment('retirada');
   }
 
   function checkout() {
@@ -275,9 +259,7 @@
 
     if (error) error.hidden = true;
     Cart.saveCustomer({ nome, sobrenome, phone });
-    const fulfillment = Cart.setFulfillment(
-      document.querySelector('input[name="cart-page-fulfillment"]:checked')?.value || Cart.getFulfillment()
-    );
+    const fulfillment = Cart.setFulfillment('retirada');
     const fullName = `${nome} ${sobrenome}`;
     const message = Cart.buildWhatsAppMessage({ fullName, phone, fulfillment });
     Cart.clear();
@@ -295,12 +277,7 @@
 
     document.getElementById('cart-page-checkout')?.addEventListener('click', checkout);
 
-    document.querySelectorAll('input[name="cart-page-fulfillment"]').forEach((el) => {
-      el.addEventListener('change', () => {
-        Cart.setFulfillment(el.value);
-        renderSummary();
-      });
-    });
+    Cart.setFulfillment('retirada');
 
     ['cart-page-nome', 'cart-page-sobrenome', 'cart-page-phone'].forEach((id) => {
       document.getElementById(id)?.addEventListener('change', () => {

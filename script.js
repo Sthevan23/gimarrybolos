@@ -31,7 +31,10 @@
     { label: "4,5 kg", detail: "47 fatias · 35 cm", price: 405 },
   ];
   const TOPPER_PRICE = 25;
+  const INITIAL_PRODUCTS_LIMIT = 9;
   let activeCategory = "todos";
+  let visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
+  let galleryExpanded = false;
   let lightboxProduct = null;
   let lightboxQty = 1;
   let lightboxFlavors = [];
@@ -99,19 +102,16 @@
     document.getElementById("footer-copy-name").textContent = S.brandName;
     document.getElementById("footer-tagline").textContent =
       "Feito com amor · confeitaria artesanal";
-    document.getElementById("hero-tagline").textContent = S.tagline;
+    document.getElementById("hero-title-line-1").textContent = S.heroTitle1 || "Bolos artesanais feitos com carinho";
+    document.getElementById("hero-title-line-2").textContent = S.heroTitle2 || "para deixar seu momento mais";
+    document.getElementById("hero-lead").textContent = S.tagline;
     document.getElementById("hero-categories").textContent = S.categoriesLine;
     document.getElementById("hero-place").textContent = S.city;
     document.getElementById("footer-year").textContent = new Date().getFullYear();
     document.getElementById("footer-address").textContent = S.address.split("·")[0].trim();
     document.getElementById("contact-address-text").textContent = S.address;
-    document.getElementById("contact-delivery-fee").textContent =
-      "Valores sob consulta — região central";
-    document.getElementById("contact-delivery-note").textContent = S.deliveryNote;
-    document.getElementById("delivery-fee-label").textContent =
-      "Taxa sob consulta";
     document.getElementById("order-pickup").textContent =
-      `Retire em ${S.address}. Entrega na região central · valores sob consulta.`;
+      `Retire em ${S.address}. Atendimento combinado pelo WhatsApp.`;
 
     document.getElementById("hero-bg").style.backgroundImage = `url('${encodeURI(S.heroImage)}')`;
     document.getElementById("sobre-image").src = encodeURI(S.aboutImage);
@@ -195,24 +195,116 @@
       .join("");
   }
 
+  function accordionSection({ id, title, summary, body, open = false, done = false }) {
+    return `
+      <div class="order-acc ${open ? "is-open" : ""} ${done ? "is-done" : ""}" id="${id}">
+        <button type="button" class="order-acc__head" data-acc-toggle="${id}">
+          <span class="order-acc__title">${title}</span>
+          <span class="order-acc__summary" id="${id}-summary">${summary}</span>
+          <span class="order-acc__chevron" aria-hidden="true">▾</span>
+        </button>
+        <div class="order-acc__body"><div class="order-acc__inner">${body}</div></div>
+      </div>`;
+  }
+
+  function setAccordionSummary(id, text) {
+    const el = document.getElementById(`${id}-summary`);
+    if (el) el.textContent = text;
+  }
+
+  function setAccordionState(id, { open, done }) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (open != null) el.classList.toggle("is-open", Boolean(open));
+    if (done != null) el.classList.toggle("is-done", Boolean(done));
+  }
+
+  function openAccordion(id) {
+    setAccordionState(id, { open: true });
+  }
+
+  function bindLightboxAccordions(root) {
+    root.querySelectorAll("[data-acc-toggle]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const acc = document.getElementById(btn.dataset.accToggle);
+        acc?.classList.toggle("is-open");
+      });
+    });
+  }
+
+  function updateLightboxAccordions() {
+    if (!lightboxProduct || !isCustomCake(lightboxProduct)) return;
+
+    const fillingsDone = lightboxFlavors.length > 0;
+    setAccordionSummary(
+      "acc-fillings",
+      fillingsDone ? lightboxFlavors.join(" / ") : "obrigatório"
+    );
+    setAccordionState("acc-fillings", { done: fillingsDone });
+
+    setAccordionSummary("acc-batter", lightboxBatter || "obrigatório");
+    setAccordionState("acc-batter", { done: Boolean(lightboxBatter) });
+
+    const sizeSummary = lightboxSize
+      ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
+      : "obrigatório";
+    setAccordionSummary("acc-size", sizeSummary);
+    setAccordionState("acc-size", { done: Boolean(lightboxSize) });
+
+    setAccordionSummary(
+      "acc-extra",
+      lightboxTopper ? `+ ${money(TOPPER_PRICE)}` : "opcional"
+    );
+    setAccordionState("acc-extra", { done: lightboxTopper });
+  }
+
   function renderProducts() {
     const list =
       activeCategory === "todos"
         ? SITE_DATA.products
         : SITE_DATA.products.filter((p) => p.category === activeCategory);
-    document.getElementById("products-grid").innerHTML = list.map(cardHTML).join("");
+    const hasMoreThanLimit = list.length > INITIAL_PRODUCTS_LIMIT;
+    const visibleList = list.slice(0, visibleProductsCount);
+
+    document.getElementById("products-grid").innerHTML = visibleList.map(cardHTML).join("");
+
+    const actions = document.getElementById("products-actions");
+    const moreBtn = document.getElementById("products-more");
+    const collapseBtn = document.getElementById("products-collapse");
+    const remaining = Math.max(0, list.length - visibleList.length);
+    actions.hidden = !hasMoreThanLimit;
+    if (moreBtn) {
+      moreBtn.hidden = remaining === 0;
+      moreBtn.textContent = remaining > INITIAL_PRODUCTS_LIMIT
+        ? `Ver mais ${INITIAL_PRODUCTS_LIMIT} bolos`
+        : `Ver mais ${remaining} bolos`;
+    }
+    if (collapseBtn) {
+      collapseBtn.hidden = visibleList.length <= INITIAL_PRODUCTS_LIMIT;
+    }
 
     const best = SITE_DATA.products.filter((p) => p.bestSeller).slice(0, 4);
     document.getElementById("bestsellers-grid").innerHTML = best.map(cardHTML).join("");
   }
 
   function renderGallery() {
-    document.getElementById("gallery-grid").innerHTML = SITE_DATA.gallery
+    const hasMoreThanLimit = SITE_DATA.gallery.length > INITIAL_PRODUCTS_LIMIT;
+    const visibleGallery = galleryExpanded || !hasMoreThanLimit
+      ? SITE_DATA.gallery
+      : SITE_DATA.gallery.slice(0, INITIAL_PRODUCTS_LIMIT);
+
+    document.getElementById("gallery-grid").innerHTML = visibleGallery
       .map(
         (src, i) =>
           `<figure><img src="${imgSrc(src)}" alt="Foto ${i + 1} da galeria" loading="lazy"></figure>`
       )
       .join("");
+
+    const actions = document.getElementById("gallery-actions");
+    const toggle = document.getElementById("gallery-toggle");
+    actions.hidden = !hasMoreThanLimit;
+    toggle.textContent = galleryExpanded ? "Ver menos fotos" : "Ver mais fotos";
+    toggle.setAttribute("aria-expanded", galleryExpanded ? "true" : "false");
   }
 
   /* ---------- lightbox ---------- */
@@ -240,65 +332,83 @@
     const flavorsEl = document.getElementById("lightbox-flavors");
     if (isCustomCake(p)) {
       flavorsEl.hidden = false;
-      flavorsEl.innerHTML = `
-        <div class="flavor-list">
-          <p class="flavor-list__label">Escolha até 2 recheios</p>
-          <div class="flavor-list__grid flavor-list__grid--wide">
-            ${CAKE_FILLINGS
-              .map(
-                (f, i) => `
-              <label class="flavor-option">
-                <input type="checkbox" name="flavor" value="${f}">
-                <span class="flavor-option__mark" aria-hidden="true"></span>
-                <span class="flavor-option__text">${f}</span>
-              </label>`
-              )
-              .join("")}
-          </div>
-        </div>
-        <div class="flavor-list">
-          <p class="flavor-list__label">Escolha a massa</p>
-          <div class="flavor-list__grid">
-            ${CAKE_BATTERS
-              .map(
+      flavorsEl.innerHTML = [
+        accordionSection({
+          id: "acc-fillings",
+          title: "Escolha até 2 recheios *",
+          summary: "obrigatório",
+          open: true,
+          body: `
+            <div class="flavor-list__grid flavor-list__grid--wide flavor-list__grid--scroll">
+              ${CAKE_FILLINGS.map(
+                (f) => `
+                <label class="flavor-option">
+                  <input type="checkbox" name="flavor" value="${f}">
+                  <span class="flavor-option__mark" aria-hidden="true"></span>
+                  <span class="flavor-option__text">${f}</span>
+                </label>`
+              ).join("")}
+            </div>`,
+        }),
+        accordionSection({
+          id: "acc-batter",
+          title: "Escolha a massa *",
+          summary: lightboxBatter,
+          open: false,
+          done: true,
+          body: `
+            <div class="flavor-list__grid">
+              ${CAKE_BATTERS.map(
                 (b, i) => `
-              <label class="flavor-option">
-                <input type="radio" name="batter" value="${b}" ${i === 0 ? "checked" : ""}>
-                <span class="flavor-option__mark" aria-hidden="true"></span>
-                <span class="flavor-option__text">${b}</span>
-              </label>`
-              )
-              .join("")}
-          </div>
-        </div>
-        <div class="flavor-list">
-          <p class="flavor-list__label">Escolha o tamanho</p>
-          <div class="size-list">
-            ${CAKE_SIZES
-              .map(
+                <label class="flavor-option">
+                  <input type="radio" name="batter" value="${b}" ${i === 0 ? "checked" : ""}>
+                  <span class="flavor-option__mark" aria-hidden="true"></span>
+                  <span class="flavor-option__text">${b}</span>
+                </label>`
+              ).join("")}
+            </div>`,
+        }),
+        accordionSection({
+          id: "acc-size",
+          title: "Escolha o tamanho *",
+          summary: lightboxSize
+            ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
+            : "obrigatório",
+          open: false,
+          done: true,
+          body: `
+            <div class="size-list">
+              ${CAKE_SIZES.map(
                 (size, i) => `
-              <label class="size-option">
-                <input type="radio" name="cake-size" value="${size.label}" data-price="${size.price}" data-detail="${size.detail}" ${i === 0 ? "checked" : ""}>
-                <span class="size-option__content">
-                  <strong>${size.label}</strong>
-                  <small>${size.detail}</small>
-                </span>
-                <b>${money(size.price)}</b>
-              </label>`
-              )
-              .join("")}
-          </div>
-        </div>
-        <div class="flavor-list flavor-list--compact">
-          <label class="extra-option">
-            <input type="checkbox" id="lightbox-topper">
-            <span class="extra-option__content">
-              <strong>Topo personalizado</strong>
-              <small>Adicionar topo decorativo ao bolo</small>
-            </span>
-            <b>+ ${money(TOPPER_PRICE)}</b>
-          </label>
-        </div>`;
+                <label class="size-option">
+                  <input type="radio" name="cake-size" value="${size.label}" data-price="${size.price}" data-detail="${size.detail}" ${i === 0 ? "checked" : ""}>
+                  <span class="size-option__content">
+                    <strong>${size.label}</strong>
+                    <small>${size.detail}</small>
+                  </span>
+                  <b>${money(size.price)}</b>
+                </label>`
+              ).join("")}
+            </div>`,
+        }),
+        accordionSection({
+          id: "acc-extra",
+          title: "Topo personalizado",
+          summary: "opcional",
+          open: false,
+          body: `
+            <label class="extra-option">
+              <input type="checkbox" id="lightbox-topper">
+              <span class="extra-option__content">
+                <strong>Topo personalizado</strong>
+                <small>Adicionar topo decorativo ao bolo</small>
+              </span>
+              <b>+ ${money(TOPPER_PRICE)}</b>
+            </label>`,
+        }),
+      ].join("");
+
+      bindLightboxAccordions(flavorsEl);
 
       flavorsEl.querySelectorAll('input[name="flavor"]').forEach((input) => {
         input.addEventListener("change", () => {
@@ -312,11 +422,19 @@
           }
           lightboxFlavors = checked.map((item) => item.value);
           document.getElementById("order-error").hidden = true;
+          updateLightboxAccordions();
+          if (lightboxFlavors.length > 0) {
+            setAccordionState("acc-fillings", { open: false, done: true });
+            openAccordion("acc-batter");
+          }
         });
       });
       flavorsEl.querySelectorAll('input[name="batter"]').forEach((input) => {
         input.addEventListener("change", () => {
           lightboxBatter = input.value;
+          updateLightboxAccordions();
+          setAccordionState("acc-batter", { open: false, done: true });
+          openAccordion("acc-size");
         });
       });
       flavorsEl.querySelectorAll('input[name="cake-size"]').forEach((input) => {
@@ -326,18 +444,25 @@
             detail: input.dataset.detail || "",
             price: Number(input.dataset.price || 0),
           };
+          updateLightboxAccordions();
           updateLightboxQty();
+          setAccordionState("acc-size", { open: false, done: true });
         });
       });
       flavorsEl.querySelector("#lightbox-topper")?.addEventListener("change", (event) => {
         lightboxTopper = Boolean(event.target.checked);
+        updateLightboxAccordions();
         updateLightboxQty();
       });
     } else if (p.flavors?.length) {
       flavorsEl.hidden = false;
-      flavorsEl.innerHTML = `
-        <div class="flavor-list">
-          <p class="flavor-list__label">Escolha o sabor</p>
+      flavorsEl.innerHTML = accordionSection({
+        id: "acc-flavor",
+        title: "Escolha o sabor *",
+        summary: lightboxFlavors[0] || "obrigatório",
+        open: true,
+        done: Boolean(lightboxFlavors[0]),
+        body: `
           <div class="flavor-list__grid">
             ${p.flavors
               .map(
@@ -349,11 +474,15 @@
               </label>`
               )
               .join("")}
-          </div>
-        </div>`;
+          </div>`,
+      });
+
+      bindLightboxAccordions(flavorsEl);
       flavorsEl.querySelectorAll('input[name="flavor"]').forEach((input) => {
         input.addEventListener("change", () => {
           lightboxFlavors = [input.value];
+          setAccordionSummary("acc-flavor", input.value);
+          setAccordionState("acc-flavor", { open: false, done: true });
         });
       });
     } else {
@@ -361,7 +490,9 @@
       flavorsEl.innerHTML = "";
     }
 
-    document.getElementById("order-lightbox").hidden = false;
+    const lightbox = document.getElementById("order-lightbox");
+    lightbox.hidden = false;
+    lightbox.classList.add("is-open");
     document.body.style.overflow = "hidden";
   }
 
@@ -382,7 +513,9 @@
   }
 
   function closeLightbox() {
-    document.getElementById("order-lightbox").hidden = true;
+    const lightbox = document.getElementById("order-lightbox");
+    lightbox.classList.remove("is-open");
+    lightbox.hidden = true;
     lightboxProduct = null;
     if (document.getElementById("cart-drawer").hidden) {
       document.body.style.overflow = "";
@@ -395,12 +528,14 @@
       const err = document.getElementById("order-error");
       err.textContent = "Escolha pelo menos 1 recheio.";
       err.hidden = false;
+      openAccordion("acc-fillings");
       return;
     }
     if (!isCustomCake(lightboxProduct) && lightboxProduct.flavors?.length && !lightboxFlavors.length) {
       const err = document.getElementById("order-error");
       err.textContent = "Escolha um sabor.";
       err.hidden = false;
+      openAccordion("acc-flavor");
       return;
     }
     const notes = document.getElementById("lightbox-notes").value.trim();
@@ -515,7 +650,6 @@
       })
       .join("");
 
-    const mode = Cart.getFulfillment();
     const subtotal = Cart.subtotal();
     const total = Cart.payable();
 
@@ -527,22 +661,10 @@
     if (finalRow) finalRow.hidden = false;
     if (checkout) checkout.hidden = false;
 
-    const deliveryNote = document.getElementById("cart-delivery-note");
     const pickupNote = document.getElementById("cart-pickup-note");
-    if (deliveryNote) deliveryNote.hidden = mode !== "entrega";
-    if (pickupNote) pickupNote.hidden = mode !== "retirada";
-
-    const feeLabel = document.getElementById("delivery-fee-label");
-    const feeText = document.getElementById("cart-delivery-fee-text");
     const pickupAddr = document.getElementById("cart-pickup-address");
-    if (feeLabel) feeLabel.textContent = "Taxa sob consulta";
-    if (feeText) feeText.textContent = "sob consulta";
+    if (pickupNote) pickupNote.hidden = false;
     if (pickupAddr) pickupAddr.textContent = S.address;
-
-    const ret = document.getElementById("cart-fulfillment-retirada");
-    const ent = document.getElementById("cart-fulfillment-entrega");
-    if (ret) ret.checked = mode === "retirada";
-    if (ent) ent.checked = mode === "entrega";
 
     const customer = Cart.loadCustomer();
     const nome = document.getElementById("cart-nome");
@@ -583,9 +705,7 @@
     const phoneInput = document.getElementById("cart-phone");
     phoneInput.value = maskPhone(phoneInput.value);
     const phone = phoneInput.value.replace(/\D/g, "");
-    const fulfillment =
-      document.querySelector('input[name="cart-fulfillment"]:checked')?.value ||
-      "retirada";
+    const fulfillment = "retirada";
 
     if (!Cart.getItems().length) {
       err.textContent = "Adicione pelo menos um item.";
@@ -705,12 +825,7 @@
       .getElementById("cart-checkout-btn")
       ?.addEventListener("click", checkoutCart);
 
-    document.querySelectorAll('input[name="cart-fulfillment"]').forEach((el) => {
-      el.addEventListener("change", () => {
-        Cart?.setFulfillment(el.value);
-        renderCart();
-      });
-    });
+    Cart?.setFulfillment("retirada");
 
     const phoneEl = document.getElementById("cart-phone");
     if (phoneEl) {
@@ -766,8 +881,35 @@
       const chip = e.target.closest("[data-cat]");
       if (chip) {
         activeCategory = chip.dataset.cat;
+        visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
         renderFilters();
         renderProducts();
+        return;
+      }
+      const moreProducts = e.target.closest("#products-more");
+      if (moreProducts) {
+        const list =
+          activeCategory === "todos"
+            ? SITE_DATA.products
+            : SITE_DATA.products.filter((p) => p.category === activeCategory);
+        visibleProductsCount = Math.min(list.length, visibleProductsCount + INITIAL_PRODUCTS_LIMIT);
+        renderProducts();
+        return;
+      }
+      const collapseProducts = e.target.closest("#products-collapse");
+      if (collapseProducts) {
+        visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
+        renderProducts();
+        document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      const toggleGallery = e.target.closest("#gallery-toggle");
+      if (toggleGallery) {
+        galleryExpanded = !galleryExpanded;
+        renderGallery();
+        if (!galleryExpanded) {
+          document.getElementById("galeria")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       }
     });
 

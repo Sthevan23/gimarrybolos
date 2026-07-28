@@ -167,11 +167,11 @@ window.AuroraCart = (() => {
   }
 
   function getFulfillment() {
-    return localStorage.getItem(FULFILLMENT_KEY) === 'entrega' ? 'entrega' : 'retirada';
+    return 'retirada';
   }
 
   function setFulfillment(value) {
-    const next = value === 'entrega' ? 'entrega' : 'retirada';
+    const next = 'retirada';
     localStorage.setItem(FULFILLMENT_KEY, next);
     notify('fulfillment');
     return next;
@@ -202,23 +202,14 @@ window.AuroraCart = (() => {
   }
 
   function fulfillmentBlock(mode) {
-    const note = getDeliveryNote();
     const address = settings().address || 'Endereço da confeitaria';
-    if (mode === 'entrega') {
-      return (
-        `FORMA: Entrega\n` +
-        `Taxa: sob consulta\n` +
-        `${note}\n` +
-        `(Confirmar endereço e valores no WhatsApp)`
-      );
-    }
     return `FORMA: Retirada no local\nEndereço: ${address}`;
   }
 
   function buildWhatsAppMessage({ fullName, phone, fulfillment }) {
     const storeName = (settings().brandName || 'Gimarry Bolos').toUpperCase();
     const list = getItems();
-    const mode = fulfillment === 'entrega' ? 'entrega' : 'retirada';
+    const mode = 'retirada';
     const subtotalValue = subtotal();
 
     const lines = list.map((item) => {
@@ -234,8 +225,7 @@ window.AuroraCart = (() => {
       `*Novo Pedido — ${storeName}*\n\n` +
       `*Cliente:*\n${fullName}\n${formatPhoneBR(phone)}\n\n` +
       `*Itens:*\n${lines}\n\n` +
-      `*Subtotal:* ${formatMoney(subtotalValue)}\n` +
-      `*Entrega:* taxa sob consulta\n\n` +
+      `*Subtotal:* ${formatMoney(subtotalValue)}\n\n` +
       `${fulfillmentBlock(mode)}\n\n` +
       `Aguardo confirmação`
     );

@@ -6,7 +6,9 @@ const SITE_DATA = {
   "settings": {
     "brandName": "Gimarry Bolos",
     "brandSub": "Bolos e Doces",
-    "tagline": "Encomenda ou pronta entrega — escolha o bolo no cardápio e finalize seu pedido em minutos",
+    "heroTitle1": "Bolos artesanais feitos com carinho",
+    "heroTitle2": "para deixar seu momento mais",
+    "tagline": "Escolha no cardápio, monte seu pedido e finalize pelo WhatsApp.",
     "heroWords": [
       "doce",
       "especial",
@@ -21,10 +23,10 @@ const SITE_DATA = {
     "deliveryFee": 0,
     "deliveryNote": "Taxa e valores sob consulta no WhatsApp",
     "heroImage": "fotos_bolos/bolos_destaques/WhatsApp Image 2026-07-08 at 12.55.35.jpeg",
-    "aboutImage": "fotos_bolos/bolos_destaques/WhatsApp Image 2026-07-08 at 12.56.11.jpeg",
+    "aboutImage": "fotos_bolos/foto_da_loja.jpeg",
     "contactImage": "fotos_bolos/foto_da_loja.jpeg",
-    "sobreText1": "A Gimarry Bolos nasceu do sonho de transformar momentos simples em lembranças especiais. Cada bolo e doce é preparado artesanalmente, com ingredientes selecionados e muito carinho.",
-    "sobreText2": "Peça pelo cardápio, retire no balcão e monte massa, recheio e tamanho do seu jeito. Valores sob consulta."
+    "sobreText1": "Tudo começou como um complemento de salário, uma vontade de passar mais tempo com a minha filha e sem muita pretenção, mas o que fazemos com o coração o universo dá um jeito de fazer dar certo.",
+    "sobreText2": "Alguns anos depois estamos aqui com muita gratidão, continuando a fazer cada bolo com todo carinho e respeito, porque sabemos que estamos levando alegria em forma de bolo. Só tenho a agradecer cada cliente que confia no meu trabalho e às várias que estão comigo desde o começo."
   },
   "categories": [
     {
