@@ -15,10 +15,17 @@ O backend sobe com **`DB_DRIVER=json`** (arquivo em `storage/data.json`) — fun
 
 Quando quiser MySQL:
 
-1. Crie o banco no hPanel.
-2. Importe `backend/database/schema.sql` e depois `seed.sql`.
-3. Copie `config/.env.example` → `config/.env` e preencha `DB_*` com `DB_DRIVER=mysql`.
-4. (Próxima evolução) repositórios PDO — o schema já está pronto.
+1. Crie o banco no hPanel — já criado: `u586160337_gimarrybolos`.
+2. No phpMyAdmin, selecione esse banco e importe `backend/database/hostinger.sql` (schema + seed).
+3. Copie `config/.env.example` → `config/.env` e preencha:
+   ```env
+   DB_DRIVER=mysql
+   DB_HOST=localhost
+   DB_NAME=u586160337_gimarrybolos
+   DB_USER=u586160337_gimarrybolos
+   DB_PASS=senha_do_hpanel
+   ```
+4. (Alternativa API legada) copie `api/config.local.example.php` → `api/config.local.php` com a mesma senha.
 
 ## 2. Upload do backend
 

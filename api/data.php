@@ -59,6 +59,15 @@ function get_password() {
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
+if ($method === 'GET' && isset($_GET['ping'])) {
+  echo json_encode([
+    'ok' => true,
+    'ready' => file_exists($file),
+    'time' => time(),
+  ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  exit;
+}
+
 if ($method === 'GET') {
   $data = read_data($file);
 

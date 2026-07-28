@@ -1,30 +1,32 @@
 /* ============================================================
-   Dolce Amore — Painel Administrativo
+   Gimarry Bolos — Painel Administrativo
    admin.css
    ============================================================ */
 
 :root {
-  --rosa-claro: #e8f0ed;
-  --rosa-escuro: #0e5244;
+  --rosa-claro: #fff1f4;
+  --rosa-escuro: #e85a76;
   --branco: #FFFFFF;
-  --creme: #f6f7f5;
-  --marrom: #5a6b64;
-  --marrom-escuro: #15201c;
-  --texto: #15201c;
-  --texto-claro: #5a6b64;
+  --creme: #fffaf8;
+  --marrom: #7a5638;
+  --marrom-escuro: #3d2610;
+  --texto: #583818;
+  --texto-claro: #7a5638;
   --sidebar-width: 260px;
   --header-height: 64px;
-  --sombra: 0 2px 12px rgba(21, 32, 28, 0.08);
+  --sombra: 0 2px 12px rgba(88, 56, 24, 0.08);
   --radius: 10px;
   --transicao: all 0.3s ease;
   --font-body: 'Manrope', sans-serif;
-  --font-title: 'Fraunces', serif;
-  --bg: #f6f7f5;
-  --accent: #d9926f;
+  --font-title: 'Cormorant Garamond', Georgia, serif;
+  --font-brand: 'Allura', cursive;
+  --bg: #fffaf8;
+  --accent: #fc7890;
   --success: #2e7d32;
   --warning: #ed6c02;
   --info: #0288d1;
   --danger: #d32f2f;
+  --line: rgba(88, 56, 24, 0.12);
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -58,7 +60,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   color: var(--branco);
 }
 
-.btn--primary:hover { background: #0a3d33; }
+.btn--primary:hover { background: #d44a68; }
 
 .btn--secondary {
   background: var(--creme);
@@ -126,7 +128,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 .form-group textarea:focus {
   outline: none;
   border-color: var(--rosa-escuro);
-  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+  box-shadow: 0 0 0 3px rgba(232, 90, 118, 0.18);
 }
 
 .form-row {
@@ -157,7 +159,10 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 
 .login__visual {
   flex: 1;
-  background: url('../imagens/hero.jpg') center/cover no-repeat;
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 20%, rgba(252, 120, 144, 0.35), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 90% 80%, rgba(88, 56, 24, 0.18), transparent 60%),
+    linear-gradient(160deg, #fff1f4 0%, #fce8ee 40%, #fffaf8 100%);
   position: relative;
   display: flex;
   align-items: center;
@@ -167,7 +172,11 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 .login__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(14, 82, 68, 0.88), rgba(217, 146, 111, 0.55));
+  background: linear-gradient(
+    145deg,
+    rgba(232, 90, 118, 0.82) 0%,
+    rgba(61, 38, 16, 0.72) 100%
+  );
 }
 
 .login__visual-content {
@@ -178,20 +187,26 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 }
 
 .login__visual-content i {
-  font-size: 4rem;
+  font-size: 3.2rem;
   margin-bottom: 16px;
-  color: var(--rosa-claro);
+  color: #fffaf8;
+  opacity: 0.95;
 }
 
 .login__visual-content h1 {
-  font-family: var(--font-title);
-  font-size: 2.5rem;
+  font-family: var(--font-brand);
+  font-size: 3.4rem;
+  font-weight: 400;
   margin-bottom: 8px;
+  line-height: 1;
+  color: #fffaf8;
 }
 
 .login__visual-content p {
-  font-size: 1.1rem;
-  opacity: 0.9;
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.88;
 }
 
 .login__form-wrapper {
@@ -200,7 +215,9 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   align-items: center;
   justify-content: center;
   padding: 40px;
-  background: var(--branco);
+  background:
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(252, 120, 144, 0.1), transparent 55%),
+    var(--creme);
 }
 
 .login__form-container { width: 100%; max-width: 360px; }
@@ -209,7 +226,8 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 
 .login__header h2 {
   font-family: var(--font-title);
-  font-size: 1.8rem;
+  font-size: 2rem;
+  font-weight: 600;
   color: var(--marrom-escuro);
   margin-bottom: 8px;
 }
@@ -224,7 +242,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   font-size: 0.85rem;
 }
 
-.login__forgot { color: var(--rosa-escuro); font-weight: 500; }
+.login__forgot { color: var(--rosa-escuro); font-weight: 600; }
 .login__forgot:hover { text-decoration: underline; }
 
 .input-password {
@@ -264,7 +282,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 .login__hint {
   margin-top: 24px;
   padding: 12px;
-  background: var(--creme);
+  background: var(--rosa-claro);
   border-radius: 8px;
   font-size: 0.8rem;
   color: var(--texto-claro);
@@ -754,7 +772,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 }
 
 .login__private-note i {
-  color: #4CAF50;
+  color: var(--rosa-escuro);
   margin-right: 4px;
 }
 
@@ -1107,6 +1125,6 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 }
 
 @media (max-width: 480px) {
-  .login__visual-content h1 { font-size: 1.8rem; }
-  .login__visual-content i { font-size: 2.5rem; }
+  .login__visual-content h1 { font-size: 2.6rem; }
+  .login__visual-content i { font-size: 2.2rem; }
 }

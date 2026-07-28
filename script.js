@@ -43,6 +43,56 @@
   let lightboxTopper = false;
   let heroWordIndex = 0;
 
+  function catalogCategories() {
+    if (typeof Storage !== "undefined") {
+      const cats = Storage.getCategories() || [];
+      if (cats.length) {
+        return [
+          { id: "todos", name: "Todos" },
+          ...cats.map((c) => ({
+            id: c.slug || String(c.id || "").replace(/^cat-/, ""),
+            name: c.name,
+          })),
+        ];
+      }
+    }
+    return SITE_DATA.categories;
+  }
+
+  function catalogProducts() {
+    if (typeof Storage !== "undefined") {
+      const list = Storage.getProducts() || [];
+      if (list.length) {
+        const cats = Storage.getCategories() || [];
+        return list
+          .filter((p) => p.active !== false)
+          .map((p) => {
+            const cat = cats.find((c) => c.id === p.categoryId);
+            const slug =
+              p.category ||
+              cat?.slug ||
+              String(p.categoryId || "").replace(/^cat-/, "") ||
+              "bolos";
+            return {
+              ...p,
+              category: slug,
+              bestSeller: p.bestSeller ?? p.featured,
+              flavors: Array.isArray(p.flavors) ? p.flavors : [],
+            };
+          });
+      }
+    }
+    return SITE_DATA.products;
+  }
+
+  function catalogGallery() {
+    if (typeof Storage !== "undefined") {
+      const g = Storage.getGallery();
+      if (Array.isArray(g) && g.length) return g;
+    }
+    return SITE_DATA.gallery || [];
+  }
+
   /* ---------- helpers ---------- */
   function waLink(phone, text = "") {
     const digits = String(phone || "").replace(/\D/g, "");
@@ -71,7 +121,7 @@
   }
 
   function categoryName(id) {
-    return SITE_DATA.categories.find((c) => c.id === id)?.name || id;
+    return catalogCategories().find((c) => c.id === id)?.name || id;
   }
 
   function isCustomCake(product) {
@@ -125,6 +175,20 @@
       .map((w, i) => `<span class="${i === 0 ? "is-active" : ""}">${w}</span>`)
       .join("");
     document.getElementById("hero-word-sr").textContent = S.heroWords[0];
+
+    const probe = document.createElement("span");
+    probe.style.cssText =
+      "position:absolute;visibility:hidden;pointer-events:none;white-space:nowrap;font-family:var(--font-brand),Allura,cursive;font-size:1.22em";
+    words.appendChild(probe);
+    let maxW = 0;
+    S.heroWords.forEach((w) => {
+      probe.textContent = w;
+      maxW = Math.max(maxW, probe.offsetWidth);
+    });
+    probe.remove();
+    if (maxW > 0 && window.matchMedia("(min-width: 641px)").matches) {
+      words.style.minWidth = `${Math.ceil(maxW)}px`;
+    }
 
     document.getElementById("contact-address").href = mapsLink(S.address);
     document.getElementById("footer-place").href = mapsLink(S.address);
@@ -187,7 +251,7 @@
 
   function renderFilters() {
     const el = document.getElementById("category-filter");
-    el.innerHTML = SITE_DATA.categories
+    el.innerHTML = catalogCategories()
       .map(
         (c) =>
           `<button type="button" class="filter-chip ${c.id === activeCategory ? "is-active" : ""}" data-cat="${c.id}">${c.name}</button>`
@@ -259,10 +323,11 @@
   }
 
   function renderProducts() {
+    const all = catalogProducts();
     const list =
       activeCategory === "todos"
-        ? SITE_DATA.products
-        : SITE_DATA.products.filter((p) => p.category === activeCategory);
+        ? all
+        : all.filter((p) => p.category === activeCategory);
     const hasMoreThanLimit = list.length > INITIAL_PRODUCTS_LIMIT;
     const visibleList = list.slice(0, visibleProductsCount);
 
@@ -283,15 +348,16 @@
       collapseBtn.hidden = visibleList.length <= INITIAL_PRODUCTS_LIMIT;
     }
 
-    const best = SITE_DATA.products.filter((p) => p.bestSeller).slice(0, 4);
+    const best = catalogProducts().filter((p) => p.bestSeller).slice(0, 4);
     document.getElementById("bestsellers-grid").innerHTML = best.map(cardHTML).join("");
   }
 
   function renderGallery() {
-    const hasMoreThanLimit = SITE_DATA.gallery.length > INITIAL_PRODUCTS_LIMIT;
+    const gallery = catalogGallery();
+    const hasMoreThanLimit = gallery.length > INITIAL_PRODUCTS_LIMIT;
     const visibleGallery = galleryExpanded || !hasMoreThanLimit
-      ? SITE_DATA.gallery
-      : SITE_DATA.gallery.slice(0, INITIAL_PRODUCTS_LIMIT);
+      ? gallery
+      : gallery.slice(0, INITIAL_PRODUCTS_LIMIT);
 
     document.getElementById("gallery-grid").innerHTML = visibleGallery
       .map(
@@ -309,7 +375,7 @@
 
   /* ---------- lightbox ---------- */
   function openLightbox(id) {
-    const p = SITE_DATA.products.find((x) => x.id === id);
+    const p = catalogProducts().find((x) => x.id === id);
     if (!p) return;
     lightboxProduct = p;
     lightboxQty = 1;
@@ -888,10 +954,11 @@
       }
       const moreProducts = e.target.closest("#products-more");
       if (moreProducts) {
+        const all = catalogProducts();
         const list =
           activeCategory === "todos"
-            ? SITE_DATA.products
-            : SITE_DATA.products.filter((p) => p.category === activeCategory);
+            ? all
+            : all.filter((p) => p.category === activeCategory);
         visibleProductsCount = Math.min(list.length, visibleProductsCount + INITIAL_PRODUCTS_LIMIT);
         renderProducts();
         return;
@@ -922,13 +989,28 @@
   }
 
   /* ---------- init ---------- */
-  hydrateBrand();
-  buildMarquee();
-  rotateHeroWords();
-  renderFilters();
-  renderProducts();
-  renderGallery();
-  renderCart();
-  setupContact();
-  setupChrome();
+  async function boot() {
+    if (typeof Storage !== "undefined") {
+      try {
+        await Storage.initCloud({ full: false });
+      } catch { /* fallback SITE_DATA */ }
+    }
+    hydrateBrand();
+    buildMarquee();
+    rotateHeroWords();
+    renderFilters();
+    renderProducts();
+    renderGallery();
+    renderCart();
+    setupContact();
+    setupChrome();
+
+    window.addEventListener("storage-updated", () => {
+      renderFilters();
+      renderProducts();
+      renderGallery();
+    });
+  }
+
+  boot();
 })();

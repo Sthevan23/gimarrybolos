@@ -621,7 +621,7 @@ function openProductModal(product = null) {
       <div class="form-row">
         <div class="form-group">
           <label>Preço (R$)</label>
-          <input type="number" id="prod-price" step="0.01" min="0" value="${product?.price || ''}" required>
+          <input type="number" id="prod-price" step="0.01" min="0" value="${product?.price || 0}" required>
         </div>
         <div class="form-group">
           <label>Categoria</label>
@@ -631,12 +631,21 @@ function openProductModal(product = null) {
         </div>
       </div>
       <div class="form-group">
-        <label>URL da Imagem</label>
-        <input type="url" id="prod-image" value="${product?.image || ''}" placeholder="https://...">
+        <label>Caminho / URL da Imagem</label>
+        <input type="text" id="prod-image" value="${product?.image || ''}" placeholder="fotos_bolos/...">
+      </div>
+      <div class="form-group">
+        <label>Sabores (um por linha)</label>
+        <textarea id="prod-flavors" rows="3" placeholder="Ninho&#10;Brigadeiro">${(product?.flavors || []).join('\n')}</textarea>
       </div>
       <div class="form-group">
         <label class="checkbox-label">
-          <input type="checkbox" id="prod-featured" ${product?.featured ? 'checked' : ''}> Produto em destaque
+          <input type="checkbox" id="prod-featured" ${product?.featured || product?.bestSeller ? 'checked' : ''}> Produto em destaque
+        </label>
+      </div>
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="prod-from-price" ${product?.fromPrice !== false && !(product?.price > 0) ? 'checked' : product?.fromPrice ? 'checked' : ''}> Preço sob consulta (a partir de)
         </label>
       </div>
       <div class="modal__actions">
@@ -646,16 +655,27 @@ function openProductModal(product = null) {
     </form>
   `);
 
-  document.getElementById('product-form').addEventListener('submit', (e) => {
+  document.getElementById('product-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const products = Storage.getProducts();
+    const categoryId = document.getElementById('prod-category').value;
+    const featured = document.getElementById('prod-featured').checked;
+    const flavors = document.getElementById('prod-flavors').value
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
     const data = {
       name: document.getElementById('prod-name').value.trim(),
       description: document.getElementById('prod-desc').value.trim(),
-      price: parseFloat(document.getElementById('prod-price').value),
-      categoryId: document.getElementById('prod-category').value,
-      image: document.getElementById('prod-image').value.trim() || 'fotos_bolos/bolo-elegante-flores.png',
-      featured: document.getElementById('prod-featured').checked
+      price: parseFloat(document.getElementById('prod-price').value) || 0,
+      categoryId,
+      category: Storage.getCategorySlug(categoryId),
+      image: document.getElementById('prod-image').value.trim() || '',
+      featured,
+      bestSeller: featured,
+      fromPrice: document.getElementById('prod-from-price').checked,
+      flavors,
+      active: true,
     };
 
     if (isEdit) {
@@ -665,7 +685,11 @@ function openProductModal(product = null) {
       products.push({ id: Storage.generateId('p'), ...data });
     }
 
-    Storage.saveProducts(products);
+    if (Storage.saveProductsAsync) {
+      await Storage.saveProductsAsync(products);
+    } else {
+      Storage.saveProducts(products);
+    }
     closeModal();
     renderProducts();
     renderDashboard();
