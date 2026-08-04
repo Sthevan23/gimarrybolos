@@ -260,8 +260,10 @@ const Storage = (() => {
   async function fetchWithTimeout(url, options = {}, ms = 15000) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), ms);
+    const method = String(options.method || 'GET').toUpperCase();
+    const cacheMode = options.cache || (method === 'GET' ? 'default' : 'no-store');
     try {
-      return await fetch(url, { ...options, signal: controller.signal, cache: 'no-store' });
+      return await fetch(url, { ...options, cache: cacheMode, signal: controller.signal });
     } finally {
       clearTimeout(timer);
     }
@@ -269,7 +271,7 @@ const Storage = (() => {
 
   async function probeCloud() {
     try {
-      const res = await fetchWithTimeout(API + '?ping=' + Date.now());
+      const res = await fetchWithTimeout(API + '?ping=1', { cache: 'no-store' }, 4000);
       const type = (res.headers.get('content-type') || '').toLowerCase();
       const body = await res.clone().json().catch(() => ({}));
       cloudEnabled = res.ok && type.includes('json') && body.ok !== false;
@@ -280,15 +282,40 @@ const Storage = (() => {
     }
   }
 
-  async function pullPublic() {
-    if (!(await probeCloud())) return false;
+  function catalogFingerprint(data) {
     try {
-      const res = await fetchWithTimeout(API + '?t=' + Date.now());
-      if (!res.ok) return false;
+      return JSON.stringify({
+        v: data.version,
+        p: (data.products || []).map((x) => [x.id, x.name, x.image, x.price, x.featured, x.categoryId]),
+        c: data.categories,
+        g: data.gallery,
+        s: data.settings,
+      });
+    } catch {
+      return '';
+    }
+  }
+
+  async function pullPublic() {
+    try {
+      // Um único GET (sem ping prévio) — menos carga no Hostinger
+      const res = await fetchWithTimeout(API);
+      if (!res.ok) {
+        cloudEnabled = false;
+        return false;
+      }
+      if (res.status === 304) {
+        cloudEnabled = true;
+        return true;
+      }
       const remote = await res.json();
-      if (remote.empty || remote.error) return false;
+      if (remote.empty || remote.error) {
+        cloudEnabled = false;
+        return false;
+      }
       if (!remote.settings || !Array.isArray(remote.products)) return false;
 
+      cloudEnabled = true;
       const current = getAll();
       const merged = {
         ...emptyStore(),
@@ -304,24 +331,38 @@ const Storage = (() => {
         finance: current.finance || [],
         auth: current.auth || emptyStore().auth,
       };
+
+      const nextFp = catalogFingerprint(merged);
+      const prevFp = catalogFingerprint(current);
+      if (nextFp && nextFp === prevFp) {
+        lastRemoteJson = JSON.stringify(merged);
+        return true;
+      }
+
       setMemory(merged);
       persistLocal(merged);
       lastRemoteJson = JSON.stringify(merged);
       notifyUpdated();
       return true;
     } catch {
+      cloudEnabled = false;
       return false;
     }
   }
 
   async function pullFull() {
     const password = getAdminPassword();
-    if (!password || !(await probeCloud())) return false;
+    if (!password) return false;
     try {
-      const res = await fetchWithTimeout(API + '?full=1&t=' + Date.now(), {
+      const res = await fetchWithTimeout(API + '?full=1', {
         headers: { 'X-Admin-Password': password },
+        cache: 'no-store',
       });
-      if (!res.ok) return false;
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 0) cloudEnabled = false;
+        return false;
+      }
+      cloudEnabled = true;
       const remote = await res.json();
       if (!remote || !remote.settings) return false;
       const json = JSON.stringify(remote);
@@ -452,13 +493,17 @@ const Storage = (() => {
     }
   }
 
-  function startCloudPolling(intervalMs = 5000) {
+  function startCloudPolling(intervalMs = 45000) {
     stopCloudPolling();
     if (!getAdminPassword()) return;
     pollTimer = setInterval(() => {
       if (pushInFlight) return;
+      if (document.visibilityState === 'hidden') return;
       pullFull();
     }, intervalMs);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') pullFull();
+    });
   }
 
   function stopCloudPolling() {
@@ -470,6 +515,14 @@ const Storage = (() => {
 
   async function initCloud({ full = false } = {}) {
     init();
+    if (!full) {
+      // Catálogo local já pinta o site; nuvem atualiza em seguida
+      const hasLocal = (getAll().products || []).length > 0;
+      if (hasLocal) {
+        pullPublic().catch(() => {});
+        return true;
+      }
+    }
     const ok = full ? await pullFull() : await pullPublic();
     if (!ok && full && getAdminPassword()) {
       await pushToCloud(getAll());

@@ -1,0 +1,24 @@
+# Gimarry Bolos — cache e segurança básica (Hostinger / Apache)
+<IfModule mod_headers.c>
+  # Imagens: 7 dias
+  <FilesMatch "\.(?i:jpe?g|png|gif|webp|svg|ico)$">
+    Header set Cache-Control "public, max-age=604800, immutable"
+  </FilesMatch>
+
+  # CSS/JS versionados com ?v=: 7 dias
+  <FilesMatch "\.(?i:css|js)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+
+  # HTML: revalida sempre
+  <FilesMatch "\.(?i:html?)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+# Bloqueia pastas sensíveis se forem publicadas por engano
+RedirectMatch 404 (?i)/(backend|node_modules|\.git|docs)/

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (sessionStorage.getItem('admin_logged') !== 'true') return;
 
   await Storage.initCloud({ full: true });
-  Storage.startCloudPolling(5000);
+  Storage.startCloudPolling(45000);
   updateSyncBadge();
 
   initSidebar();

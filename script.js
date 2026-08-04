@@ -21,15 +21,11 @@
   ];
   const CAKE_BATTERS = ["Branca", "Chocolate"];
   const CAKE_SIZES = [
-    { label: "1 kg", detail: "12 fatias · 15 cm", price: 95 },
-    { label: "1,5 kg", detail: "17 fatias · 15 cm", price: 140 },
-    { label: "2 kg", detail: "22 fatias · 20 cm", price: 180 },
-    { label: "2,5 kg", detail: "27 fatias · 20 cm", price: 225 },
-    { label: "3 kg", detail: "32 fatias · 30 cm", price: 270 },
-    { label: "3,5 kg", detail: "37 fatias · 30 cm", price: 315 },
-    { label: "4 kg", detail: "42 fatias · 35 cm", price: 360 },
-    { label: "4,5 kg", detail: "47 fatias · 35 cm", price: 405 },
+    { label: "Bolo parabéns", detail: "serve 7 fatias", price: 65 },
+    { label: "Bolo comemore", detail: "serve 9 fatias", price: 75 },
+    { label: "Bolo celebrar", detail: "serve 13 fatias", price: 95 },
   ];
+  const MAX_FILLINGS = 2;
   const TOPPER_PRICE = 25;
   const INITIAL_PRODUCTS_LIMIT = 9;
   let activeCategory = "todos";
@@ -88,9 +84,10 @@
   function catalogGallery() {
     if (typeof Storage !== "undefined") {
       const g = Storage.getGallery();
-      if (Array.isArray(g) && g.length) return g;
+      if (Array.isArray(g) && g.length) return g.slice(0, 24);
     }
-    return SITE_DATA.gallery || [];
+    const g = SITE_DATA.gallery || [];
+    return g.slice(0, 24);
   }
 
   /* ---------- helpers ---------- */
@@ -128,6 +125,12 @@
     return ["bolos", "destaques"].includes(product?.category);
   }
 
+  function isBentoCake(product) {
+    return product?.category === "bento";
+  }
+
+  const MAX_BENTO_FLAVORS = 2;
+
   function toast(msg, withCartLink = false) {
     const el = document.getElementById("cart-feedback");
     if (!el) return;
@@ -164,8 +167,18 @@
       `Retire em ${S.address}. Atendimento combinado pelo WhatsApp.`;
 
     document.getElementById("hero-bg").style.backgroundImage = `url('${encodeURI(S.heroImage)}')`;
-    document.getElementById("sobre-image").src = encodeURI(S.aboutImage);
-    document.getElementById("contact-image").src = encodeURI(S.contactImage);
+    const sobreImg = document.getElementById("sobre-image");
+    if (sobreImg) {
+      sobreImg.loading = "lazy";
+      sobreImg.decoding = "async";
+      sobreImg.src = encodeURI(S.aboutImage);
+    }
+    const contactImg = document.getElementById("contact-image");
+    if (contactImg) {
+      contactImg.loading = "lazy";
+      contactImg.decoding = "async";
+      contactImg.src = encodeURI(S.contactImage);
+    }
 
     const sobre = document.getElementById("sobre-text");
     sobre.innerHTML = `<p>${S.sobreText1}</p><p>${S.sobreText2}</p>`;
@@ -379,7 +392,7 @@
     if (!p) return;
     lightboxProduct = p;
     lightboxQty = 1;
-    lightboxFlavors = isCustomCake(p)
+    lightboxFlavors = isCustomCake(p) || isBentoCake(p)
       ? []
       : (p.flavors?.[0] ? [p.flavors[0]] : []);
     lightboxBatter = isCustomCake(p) ? CAKE_BATTERS[0] : "";
@@ -401,7 +414,7 @@
       flavorsEl.innerHTML = [
         accordionSection({
           id: "acc-fillings",
-          title: "Escolha até 2 recheios *",
+          title: `Escolha até ${MAX_FILLINGS} recheios *`,
           summary: "obrigatório",
           open: true,
           body: `
@@ -436,7 +449,7 @@
         }),
         accordionSection({
           id: "acc-size",
-          title: "Escolha o tamanho *",
+          title: "Linha Celebre — tamanho *",
           summary: lightboxSize
             ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
             : "obrigatório",
@@ -479,10 +492,10 @@
       flavorsEl.querySelectorAll('input[name="flavor"]').forEach((input) => {
         input.addEventListener("change", () => {
           const checked = [...flavorsEl.querySelectorAll('input[name="flavor"]:checked')];
-          if (checked.length > 2) {
+          if (checked.length > MAX_FILLINGS) {
             input.checked = false;
             const err = document.getElementById("order-error");
-            err.textContent = "Escolha no máximo 2 recheios.";
+            err.textContent = `Escolha no máximo ${MAX_FILLINGS} recheios.`;
             err.hidden = false;
             return;
           }
@@ -519,6 +532,52 @@
         lightboxTopper = Boolean(event.target.checked);
         updateLightboxAccordions();
         updateLightboxQty();
+      });
+    } else if (isBentoCake(p) && p.flavors?.length) {
+      flavorsEl.hidden = false;
+      flavorsEl.innerHTML = accordionSection({
+        id: "acc-flavor",
+        title: `Escolha até ${MAX_BENTO_FLAVORS} sabores *`,
+        summary: "obrigatório",
+        open: true,
+        done: false,
+        body: `
+          <div class="flavor-list__grid">
+            ${p.flavors
+              .map(
+                (f) => `
+              <label class="flavor-option">
+                <input type="checkbox" name="flavor" value="${f}">
+                <span class="flavor-option__mark" aria-hidden="true"></span>
+                <span class="flavor-option__text">${f}</span>
+              </label>`
+              )
+              .join("")}
+          </div>`,
+      });
+
+      bindLightboxAccordions(flavorsEl);
+      flavorsEl.querySelectorAll('input[name="flavor"]').forEach((input) => {
+        input.addEventListener("change", () => {
+          const checked = [...flavorsEl.querySelectorAll('input[name="flavor"]:checked')];
+          if (checked.length > MAX_BENTO_FLAVORS) {
+            input.checked = false;
+            const err = document.getElementById("order-error");
+            err.textContent = `No bento cake, escolha no máximo ${MAX_BENTO_FLAVORS} sabores.`;
+            err.hidden = false;
+            return;
+          }
+          lightboxFlavors = checked.map((item) => item.value);
+          document.getElementById("order-error").hidden = true;
+          setAccordionSummary(
+            "acc-flavor",
+            lightboxFlavors.length ? lightboxFlavors.join(" / ") : "obrigatório"
+          );
+          setAccordionState("acc-flavor", {
+            open: lightboxFlavors.length === 0,
+            done: lightboxFlavors.length > 0,
+          });
+        });
       });
     } else if (p.flavors?.length) {
       flavorsEl.hidden = false;
@@ -597,7 +656,22 @@
       openAccordion("acc-fillings");
       return;
     }
-    if (!isCustomCake(lightboxProduct) && lightboxProduct.flavors?.length && !lightboxFlavors.length) {
+    if (isBentoCake(lightboxProduct) && lightboxProduct.flavors?.length) {
+      if (!lightboxFlavors.length) {
+        const err = document.getElementById("order-error");
+        err.textContent = "Escolha pelo menos 1 sabor no bento cake.";
+        err.hidden = false;
+        openAccordion("acc-flavor");
+        return;
+      }
+      if (lightboxFlavors.length > MAX_BENTO_FLAVORS) {
+        const err = document.getElementById("order-error");
+        err.textContent = `No bento cake, escolha no máximo ${MAX_BENTO_FLAVORS} sabores.`;
+        err.hidden = false;
+        openAccordion("acc-flavor");
+        return;
+      }
+    } else if (!isCustomCake(lightboxProduct) && lightboxProduct.flavors?.length && !lightboxFlavors.length) {
       const err = document.getElementById("order-error");
       err.textContent = "Escolha um sabor.";
       err.hidden = false;
@@ -990,11 +1064,7 @@
 
   /* ---------- init ---------- */
   async function boot() {
-    if (typeof Storage !== "undefined") {
-      try {
-        await Storage.initCloud({ full: false });
-      } catch { /* fallback SITE_DATA */ }
-    }
+    // Pinta na hora com seed local — API atualiza em background (menos espera)
     hydrateBrand();
     buildMarquee();
     rotateHeroWords();
@@ -1004,6 +1074,15 @@
     renderCart();
     setupContact();
     setupChrome();
+
+    if (typeof Storage !== "undefined") {
+      try {
+        await Storage.initCloud({ full: false });
+        renderFilters();
+        renderProducts();
+        renderGallery();
+      } catch { /* seed local já está ok */ }
+    }
 
     window.addEventListener("storage-updated", () => {
       renderFilters();

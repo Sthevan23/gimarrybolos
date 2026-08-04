@@ -33,14 +33,24 @@ function write_data($file, $data) {
 }
 
 function public_payload($data) {
+  $gallery = $data['gallery'] ?? [];
+  if (!is_array($gallery)) {
+    $gallery = [];
+  }
+  // Galeria curta no público (evita 129 paths duplicando os produtos)
+  if (count($gallery) > 24) {
+    $gallery = array_slice($gallery, 0, 24);
+  }
+
   return [
+    'ok' => true,
     'version' => $data['version'] ?? 1,
     'settings' => $data['settings'] ?? new stdClass(),
     'categories' => $data['categories'] ?? [],
     'products' => $data['products'] ?? [],
     'reviews' => $data['reviews'] ?? [],
     'faq' => $data['faq'] ?? [],
-    'gallery' => $data['gallery'] ?? [],
+    'gallery' => array_values($gallery),
   ];
 }
 
@@ -60,6 +70,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
 if ($method === 'GET' && isset($_GET['ping'])) {
+  header('Cache-Control: no-store');
   echo json_encode([
     'ok' => true,
     'ready' => file_exists($file),
@@ -72,7 +83,8 @@ if ($method === 'GET') {
   $data = read_data($file);
 
   if ($data === null) {
-    echo json_encode(['empty' => true]);
+    header('Cache-Control: no-store');
+    echo json_encode(['empty' => true, 'ok' => false]);
     exit;
   }
 
@@ -80,6 +92,7 @@ if ($method === 'GET') {
   $wantFull = isset($_GET['full']) || $action === 'full';
 
   if ($wantFull) {
+    header('Cache-Control: no-store');
     $ok = isset($data['auth']['password']) && hash_equals((string) $data['auth']['password'], (string) $password);
     if (!$ok) {
       http_response_code(401);
@@ -90,8 +103,22 @@ if ($method === 'GET') {
     exit;
   }
 
-  // Site público: sem pedidos, clientes nem senha
-  echo json_encode(public_payload($data), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  // Site público: ETag para economizar banda em visitas repetidas
+  $payload = public_payload($data);
+  $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  $etag = '"' . md5($json) . '"';
+  $mtime = @filemtime($file) ?: time();
+  header('ETag: ' . $etag);
+  header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
+  header('Cache-Control: public, max-age=60');
+
+  $ifNoneMatch = $_SERVER['HTTP_IF_NONE_MATCH'] ?? '';
+  if ($ifNoneMatch !== '' && trim($ifNoneMatch) === $etag) {
+    http_response_code(304);
+    exit;
+  }
+
+  echo $json;
   exit;
 }
 
