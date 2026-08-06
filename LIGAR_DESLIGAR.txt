@@ -1,0 +1,22 @@
+LIGAR / DESLIGAR O SITE GIMARRY
+================================
+
+Agora o site está preparado para ficar OFF (arquivo SITE_OFF).
+
+DESLIGAR (economiza Hostinger)
+------------------------------
+1. No File Manager da Hostinger, pasta public_html do gimarrybolos
+2. Envie estes 3 itens:
+   - SITE_OFF          (arquivo vazio)
+   - offline.html
+   - .htaccess         (atualizado)
+3. Pronto: https://gimarrybolos.com.br mostra só a página leve
+   (não carrega fotos, PHP, admin nem API)
+
+LIGAR DE NOVO (quando forem usar)
+---------------------------------
+1. No File Manager, apague o arquivo SITE_OFF
+2. Pronto: o site volta normal
+
+Dica: deixe offline.html e .htaccess sempre no servidor.
+Só cria/apaga o SITE_OFF para ligar e desligar.

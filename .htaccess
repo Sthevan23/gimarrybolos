@@ -1,4 +1,17 @@
-# Gimarry Bolos — cache e segurança básica (Hostinger / Apache)
+# Gimarry Bolos — cache, segurança e modo OFF
+
+# ---- MODO OFF (arquivo SITE_OFF na raiz) ----
+# Com SITE_OFF presente: site, admin e API ficam desligados (página leve).
+# Para LIGAR de novo: apague o arquivo SITE_OFF no File Manager.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Se SITE_OFF existir, tudo vai para offline.html (exceto a própria página)
+  RewriteCond %{DOCUMENT_ROOT}/SITE_OFF -f
+  RewriteCond %{REQUEST_URI} !/offline\.html$ [NC]
+  RewriteRule ^ offline.html [L]
+</IfModule>
+
 <IfModule mod_headers.c>
   # Imagens: 30 dias
   <FilesMatch "\.(?i:jpe?g|png|gif|webp|svg|ico)$">
