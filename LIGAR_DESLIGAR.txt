@@ -1,20 +1,19 @@
-LIGAR / DESLIGAR O SITE GIMARRY
-================================
+LIGAR / DESLIGAR SITES (Hostinger)
+==================================
 
-O limite que derruba tudo é "Máximo de processos" (120), não disco.
+Limite crítico: Máximo de processos = 120 (compartilhado por TODOS os sites).
 
-DESLIGAR (libera processos)
----------------------------
-Deixe o arquivo SITE_OFF na raiz (já no repo).
-Com auto deploy + SITE_OFF: site/admin/API/fotos → offline.html
+AGORA: sites LIGADOS e leves (sem SITE_OFF).
 
-LIGAR DE NOVO
--------------
-1. Apague SITE_OFF no GitHub ou no File Manager
-2. Commit/push (se usar Git) ou só delete no servidor
+Para PAUSAR um site (se precisar aliviar de novo):
+1. Crie um arquivo vazio chamado SITE_OFF na raiz do site
+2. Commit/push (ou suba no File Manager)
 
-NO PAINEL HOSTINGER
--------------------
-- Em cada site: Ferramentas → "Parar processos" / liberar recursos (se aparecer)
-- Sites que não usa: pause/exclua do plano
-- Aurora com admin aberto também gera processo — não deixe painel aberto 24h
+Para LIGAR de novo:
+1. Apague SITE_OFF
+
+Regras pra NÃO derrubar os outros:
+- Não deixar painel /admin aberto 24h
+- Sem polling automático (já desligado)
+- Visitante não chama PHP a cada página (já no código)
+- No hPanel: "Parar processos" se o medidor subir
