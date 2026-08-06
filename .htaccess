@@ -1,13 +1,13 @@
 # Gimarry Bolos — cache e segurança básica (Hostinger / Apache)
 <IfModule mod_headers.c>
-  # Imagens: 7 dias
+  # Imagens: 30 dias
   <FilesMatch "\.(?i:jpe?g|png|gif|webp|svg|ico)$">
-    Header set Cache-Control "public, max-age=604800, immutable"
+    Header set Cache-Control "public, max-age=2592000, immutable"
   </FilesMatch>
 
-  # CSS/JS versionados com ?v=: 7 dias
+  # CSS/JS versionados com ?v=: 30 dias
   <FilesMatch "\.(?i:css|js)$">
-    Header set Cache-Control "public, max-age=604800"
+    Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>
 
   # HTML: revalida sempre

@@ -24,12 +24,26 @@ function read_data($file) {
   return is_array($data) ? $data : null;
 }
 
+function write_public_catalog($data) {
+  $payload = public_payload($data);
+  $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  if ($json === false) {
+    return false;
+  }
+  $publicFile = __DIR__ . '/catalog.json';
+  return file_put_contents($publicFile, $json, LOCK_EX) !== false;
+}
+
 function write_data($file, $data) {
   $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   if ($json === false) {
     return false;
   }
-  return file_put_contents($file, $json, LOCK_EX) !== false;
+  $ok = file_put_contents($file, $json, LOCK_EX) !== false;
+  if ($ok) {
+    write_public_catalog($data);
+  }
+  return $ok;
 }
 
 function public_payload($data) {
@@ -80,6 +94,28 @@ if ($method === 'GET' && isset($_GET['ping'])) {
 }
 
 if ($method === 'GET') {
+  $password = $_SERVER['HTTP_X_ADMIN_PASSWORD'] ?? '';
+  $wantFull = isset($_GET['full']) || $action === 'full';
+
+  // Público: serve arquivo estático (quase zero CPU)
+  if (!$wantFull) {
+    $catalogFile = __DIR__ . '/catalog.json';
+    if (is_file($catalogFile)) {
+      $mtime = filemtime($catalogFile) ?: time();
+      $etag = '"' . md5_file($catalogFile) . '"';
+      header('ETag: ' . $etag);
+      header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
+      header('Cache-Control: public, max-age=600');
+      $ifNoneMatch = $_SERVER['HTTP_IF_NONE_MATCH'] ?? '';
+      if ($ifNoneMatch !== '' && trim($ifNoneMatch) === $etag) {
+        http_response_code(304);
+        exit;
+      }
+      readfile($catalogFile);
+      exit;
+    }
+  }
+
   $data = read_data($file);
 
   if ($data === null) {
@@ -87,9 +123,6 @@ if ($method === 'GET') {
     echo json_encode(['empty' => true, 'ok' => false]);
     exit;
   }
-
-  $password = $_SERVER['HTTP_X_ADMIN_PASSWORD'] ?? '';
-  $wantFull = isset($_GET['full']) || $action === 'full';
 
   if ($wantFull) {
     header('Cache-Control: no-store');
@@ -103,22 +136,10 @@ if ($method === 'GET') {
     exit;
   }
 
-  // Site público: ETag para economizar banda em visitas repetidas
+  // Fallback se catalog.json ainda não existir
+  write_public_catalog($data);
   $payload = public_payload($data);
-  $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-  $etag = '"' . md5($json) . '"';
-  $mtime = @filemtime($file) ?: time();
-  header('ETag: ' . $etag);
-  header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
-  header('Cache-Control: public, max-age=60');
-
-  $ifNoneMatch = $_SERVER['HTTP_IF_NONE_MATCH'] ?? '';
-  if ($ifNoneMatch !== '' && trim($ifNoneMatch) === $etag) {
-    http_response_code(304);
-    exit;
-  }
-
-  echo $json;
+  echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
 

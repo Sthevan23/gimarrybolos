@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/data.php
+Disallow: /admin/
+Disallow: /backend/
+Crawl-delay: 2
+
+Sitemap: https://gimarrybolos.com.br/

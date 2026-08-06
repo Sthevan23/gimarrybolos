@@ -27,7 +27,7 @@
   ];
   const MAX_FILLINGS = 2;
   const TOPPER_PRICE = 25;
-  const INITIAL_PRODUCTS_LIMIT = 9;
+  const INITIAL_PRODUCTS_LIMIT = 6;
   let activeCategory = "todos";
   let visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
   let galleryExpanded = false;
@@ -115,6 +115,19 @@
 
   function imgSrc(path) {
     return encodeURI(String(path || ""));
+  }
+
+  /** Miniatura leve para cards/galeria (fotos_bolos/_thumbs/...). */
+  function thumbSrc(path) {
+    const raw = String(path || "").trim();
+    if (!raw) return "";
+    if (/^https?:\/\//i.test(raw) || raw.startsWith("data:")) return imgSrc(raw);
+    const cleaned = raw.replace(/^\/+/, "");
+    if (!cleaned.startsWith("fotos_bolos/")) return imgSrc(raw);
+    const rest = cleaned.slice("fotos_bolos/".length);
+    if (rest.startsWith("_thumbs/")) return imgSrc(cleaned);
+    const noExt = rest.replace(/\.(jpe?g|png|webp)$/i, "");
+    return imgSrc(`fotos_bolos/_thumbs/${noExt}.jpg`);
   }
 
   function categoryName(id) {
@@ -241,7 +254,7 @@
         <button type="button" class="product-card__hit" data-open="${p.id}" aria-label="Ver ${p.name}"></button>
         <div class="product-card__img">
           ${badge}
-          <img src="${imgSrc(p.image)}" alt="${p.name}" loading="lazy">
+          <img src="${thumbSrc(p.image)}" alt="${p.name}" loading="lazy" decoding="async" width="480" height="600">
           <span class="product-card__img-veil" aria-hidden="true"></span>
         </div>
         <div class="product-card__body">
@@ -375,7 +388,7 @@
     document.getElementById("gallery-grid").innerHTML = visibleGallery
       .map(
         (src, i) =>
-          `<figure><img src="${imgSrc(src)}" alt="Foto ${i + 1} da galeria" loading="lazy"></figure>`
+          `<figure><img src="${thumbSrc(src)}" alt="Foto ${i + 1} da galeria" loading="lazy" decoding="async" width="480" height="600"></figure>`
       )
       .join("");
 
@@ -769,7 +782,7 @@
         const line = (Number(i.price) || 0) * (Number(i.qty) || 0);
         return `
       <article class="cart-item">
-        <img class="cart-item__img" src="${imgSrc(i.image || "")}" alt="">
+        <img class="cart-item__img" src="${thumbSrc(i.image || "")}" alt="" loading="lazy" decoding="async">
         <div>
           <p class="cart-item__name">${i.name}</p>
           ${meta ? `<p class="cart-item__meta">${meta}</p>` : ""}

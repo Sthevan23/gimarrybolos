@@ -9,6 +9,7 @@ const Storage = (() => {
   const DEFAULT_ADMIN_EMAIL = 'admin@sthevandev.com.br';
   const DEFAULT_ADMIN_PASSWORD = 'admin123';
   const PRODUCTION_API = 'https://gimarrybolos.com.br/api/data.php';
+  const PRODUCTION_CATALOG = 'https://gimarrybolos.com.br/api/catalog.json';
   const isLocalHost = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname || '');
 
   const API = (() => {
@@ -17,6 +18,14 @@ const Storage = (() => {
     if (path.includes('/admin/')) return path.replace(/\/admin\/.*$/, '/api/data.php');
     if (path.endsWith('/')) return path + 'api/data.php';
     return path.replace(/\/[^/]*$/, '/api/data.php');
+  })();
+
+  const CATALOG_URL = (() => {
+    if (isLocalHost || location.protocol === 'file:') return PRODUCTION_CATALOG;
+    const path = window.location.pathname || '';
+    if (path.includes('/admin/')) return path.replace(/\/admin\/.*$/, '/api/catalog.json');
+    if (path.endsWith('/')) return path + 'api/catalog.json';
+    return path.replace(/\/[^/]*$/, '/api/catalog.json');
   })();
 
   let cloudEnabled = false;
@@ -298,56 +307,64 @@ const Storage = (() => {
 
   async function pullPublic() {
     try {
-      // Um único GET (sem ping prévio) — menos carga no Hostinger
-      const res = await fetchWithTimeout(API);
+      // Arquivo estático (sem PHP) — alivia Hostinger LVE
+      const res = await fetchWithTimeout(CATALOG_URL);
       if (!res.ok) {
-        cloudEnabled = false;
-        return false;
+        // fallback PHP só se o estático falhar
+        const phpRes = await fetchWithTimeout(API);
+        if (!phpRes.ok) {
+          cloudEnabled = false;
+          return false;
+        }
+        return applyPublicRemote(await phpRes.json());
       }
       if (res.status === 304) {
         cloudEnabled = true;
         return true;
       }
-      const remote = await res.json();
-      if (remote.empty || remote.error) {
-        cloudEnabled = false;
-        return false;
-      }
-      if (!remote.settings || !Array.isArray(remote.products)) return false;
-
-      cloudEnabled = true;
-      const current = getAll();
-      const merged = {
-        ...emptyStore(),
-        version: remote.version || DATA_VERSION,
-        settings: remote.settings,
-        categories: remote.categories || [],
-        products: remote.products || [],
-        reviews: remote.reviews || [],
-        faq: remote.faq || [],
-        gallery: remote.gallery || [],
-        clients: current.clients || [],
-        orders: current.orders || [],
-        finance: current.finance || [],
-        auth: current.auth || emptyStore().auth,
-      };
-
-      const nextFp = catalogFingerprint(merged);
-      const prevFp = catalogFingerprint(current);
-      if (nextFp && nextFp === prevFp) {
-        lastRemoteJson = JSON.stringify(merged);
-        return true;
-      }
-
-      setMemory(merged);
-      persistLocal(merged);
-      lastRemoteJson = JSON.stringify(merged);
-      notifyUpdated();
-      return true;
+      return applyPublicRemote(await res.json());
     } catch {
       cloudEnabled = false;
       return false;
     }
+  }
+
+  function applyPublicRemote(remote) {
+    if (!remote || remote.empty || remote.error) {
+      cloudEnabled = false;
+      return false;
+    }
+    if (!remote.settings || !Array.isArray(remote.products)) return false;
+
+    cloudEnabled = true;
+    const current = getAll();
+    const merged = {
+      ...emptyStore(),
+      version: remote.version || DATA_VERSION,
+      settings: remote.settings,
+      categories: remote.categories || [],
+      products: remote.products || [],
+      reviews: remote.reviews || [],
+      faq: remote.faq || [],
+      gallery: remote.gallery || [],
+      clients: current.clients || [],
+      orders: current.orders || [],
+      finance: current.finance || [],
+      auth: current.auth || emptyStore().auth,
+    };
+
+    const nextFp = catalogFingerprint(merged);
+    const prevFp = catalogFingerprint(current);
+    if (nextFp && nextFp === prevFp) {
+      lastRemoteJson = JSON.stringify(merged);
+      return true;
+    }
+
+    setMemory(merged);
+    persistLocal(merged);
+    lastRemoteJson = JSON.stringify(merged);
+    notifyUpdated();
+    return true;
   }
 
   async function pullFull() {
@@ -493,7 +510,7 @@ const Storage = (() => {
     }
   }
 
-  function startCloudPolling(intervalMs = 45000) {
+  function startCloudPolling(intervalMs = 120000) {
     stopCloudPolling();
     if (!getAdminPassword()) return;
     pollTimer = setInterval(() => {
@@ -516,15 +533,12 @@ const Storage = (() => {
   async function initCloud({ full = false } = {}) {
     init();
     if (!full) {
-      // Catálogo local já pinta o site; nuvem atualiza em seguida
-      const hasLocal = (getAll().products || []).length > 0;
-      if (hasLocal) {
-        pullPublic().catch(() => {});
-        return true;
-      }
+      // Visitante NÃO chama PHP/API — evita estourar LVE da Hostinger
+      // Catálogo vem de js/data.js + localStorage. Painel sincroniza quando abre.
+      return true;
     }
-    const ok = full ? await pullFull() : await pullPublic();
-    if (!ok && full && getAdminPassword()) {
+    const ok = await pullFull();
+    if (!ok && getAdminPassword()) {
       await pushToCloud(getAll());
     }
     return cloudEnabled;

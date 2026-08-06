@@ -1,0 +1,32 @@
+POR QUE DERRUBA OS OUTROS SITES
+================================
+O plano Business tem 5 sites no MESMO limite de CPU/processos.
+Disco está ok (3%). O problema é recurso compartilhado (LVE).
+Quando o Gimarry chama PHP demais, o limite vai a 100% e
+TODOS os sites do plano caem juntos.
+
+O QUE FAZER NA HOSTINGER (File Manager / FTP)
+--------------------------------------------
+1) SUBIR estes arquivos atualizados:
+   - index.html
+   - script.js
+   - js/storage.js
+   - js/data.js
+   - api/data.php
+   - api/catalog.json
+   - api/.htaccess
+   - .htaccess
+   - robots.txt
+   - admin/admin.js , admin/index.html , admin/login.html
+   - pasta fotos_bolos/_thumbs/  (miniaturas leves)
+
+2) APAGAR no servidor (se existir — pesa e não usa):
+   - frontend/          (cópia inteira do site)
+   - frontend/public/fotos_bolos/
+   - imagens/           (se ainda existir)
+   - qualquer backup .zip antigo na public_html
+
+3) NÃO deixar o painel /admin aberto o dia todo no celular.
+
+Depois do upload, o site público NÃO chama mais a API PHP
+a cada visita — isso é o que mais alivia o plano.

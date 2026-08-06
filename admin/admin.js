@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (sessionStorage.getItem('admin_logged') !== 'true') return;
 
   await Storage.initCloud({ full: true });
-  Storage.startCloudPolling(45000);
+  // Sem polling automático — evita estourar CPU da Hostinger com vários sites no plano
   updateSyncBadge();
 
   initSidebar();
