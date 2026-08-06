@@ -1,29 +1,35 @@
-# Gimarry Bolos — cache, segurança e modo OFF
+# Gimarry Bolos — cache, segurança e modo OFF (menos processos Hostinger)
 
 # ---- MODO OFF (arquivo SITE_OFF na raiz) ----
-# Com SITE_OFF presente: site, admin e API ficam desligados (página leve).
-# Para LIGAR de novo: apague o arquivo SITE_OFF no File Manager.
+# Com SITE_OFF: site/admin/API/fotos ficam off → página leve (quase 0 processo).
+# Para LIGAR: apague SITE_OFF.
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Se SITE_OFF existir, tudo vai para offline.html (exceto a própria página)
   RewriteCond %{DOCUMENT_ROOT}/SITE_OFF -f
   RewriteCond %{REQUEST_URI} !/offline\.html$ [NC]
   RewriteRule ^ offline.html [L]
 </IfModule>
 
+# Bloqueia bots agressivos (cada hit = processo)
+<IfModule mod_rewrite.c>
+  RewriteCond %{HTTP_USER_AGENT} (AhrefsBot|SemrushBot|DotBot|MJ12bot|Bytespider|PetalBot|ClaudeBot|GPTBot|CCBot|DataForSeo|BLEXBot|Zoominfo|Scrapy) [NC]
+  RewriteRule .* - [F,L]
+</IfModule>
+
+# PHP na API: saída rápida se SITE_OFF (fallback se rewrite falhar)
+<IfModule mod_rewrite.c>
+  RewriteCond %{DOCUMENT_ROOT}/SITE_OFF -f
+  RewriteRule ^api/.*\.php$ - [F,L]
+</IfModule>
+
 <IfModule mod_headers.c>
-  # Imagens: 30 dias
   <FilesMatch "\.(?i:jpe?g|png|gif|webp|svg|ico)$">
     Header set Cache-Control "public, max-age=2592000, immutable"
   </FilesMatch>
-
-  # CSS/JS versionados com ?v=: 30 dias
   <FilesMatch "\.(?i:css|js)$">
     Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>
-
-  # HTML: revalida sempre
   <FilesMatch "\.(?i:html?)$">
     Header set Cache-Control "no-cache"
   </FilesMatch>
@@ -33,5 +39,4 @@
   AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
 </IfModule>
 
-# Bloqueia pastas sensíveis se forem publicadas por engano
 RedirectMatch 404 (?i)/(backend|node_modules|\.git|docs)/

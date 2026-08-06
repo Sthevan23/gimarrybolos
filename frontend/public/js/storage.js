@@ -279,16 +279,9 @@ const Storage = (() => {
   }
 
   async function probeCloud() {
-    try {
-      const res = await fetchWithTimeout(API + '?ping=1', { cache: 'no-store' }, 4000);
-      const type = (res.headers.get('content-type') || '').toLowerCase();
-      const body = await res.clone().json().catch(() => ({}));
-      cloudEnabled = res.ok && type.includes('json') && body.ok !== false;
-      return cloudEnabled;
-    } catch {
-      cloudEnabled = false;
-      return false;
-    }
+    // Desativado no site público — ping também conta como processo
+    cloudEnabled = false;
+    return false;
   }
 
   function catalogFingerprint(data) {
@@ -510,17 +503,9 @@ const Storage = (() => {
     }
   }
 
-  function startCloudPolling(intervalMs = 120000) {
+  function startCloudPolling() {
+    // Desativado: polling gera processo PHP demais na Hostinger (limite 120).
     stopCloudPolling();
-    if (!getAdminPassword()) return;
-    pollTimer = setInterval(() => {
-      if (pushInFlight) return;
-      if (document.visibilityState === 'hidden') return;
-      pullFull();
-    }, intervalMs);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') pullFull();
-    });
   }
 
   function stopCloudPolling() {

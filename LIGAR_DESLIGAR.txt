@@ -1,22 +1,20 @@
 LIGAR / DESLIGAR O SITE GIMARRY
 ================================
 
-Agora o site está preparado para ficar OFF (arquivo SITE_OFF).
+O limite que derruba tudo é "Máximo de processos" (120), não disco.
 
-DESLIGAR (economiza Hostinger)
-------------------------------
-1. No File Manager da Hostinger, pasta public_html do gimarrybolos
-2. Envie estes 3 itens:
-   - SITE_OFF          (arquivo vazio)
-   - offline.html
-   - .htaccess         (atualizado)
-3. Pronto: https://gimarrybolos.com.br mostra só a página leve
-   (não carrega fotos, PHP, admin nem API)
+DESLIGAR (libera processos)
+---------------------------
+Deixe o arquivo SITE_OFF na raiz (já no repo).
+Com auto deploy + SITE_OFF: site/admin/API/fotos → offline.html
 
-LIGAR DE NOVO (quando forem usar)
----------------------------------
-1. No File Manager, apague o arquivo SITE_OFF
-2. Pronto: o site volta normal
+LIGAR DE NOVO
+-------------
+1. Apague SITE_OFF no GitHub ou no File Manager
+2. Commit/push (se usar Git) ou só delete no servidor
 
-Dica: deixe offline.html e .htaccess sempre no servidor.
-Só cria/apaga o SITE_OFF para ligar e desligar.
+NO PAINEL HOSTINGER
+-------------------
+- Em cada site: Ferramentas → "Parar processos" / liberar recursos (se aparecer)
+- Sites que não usa: pause/exclua do plano
+- Aurora com admin aberto também gera processo — não deixe painel aberto 24h

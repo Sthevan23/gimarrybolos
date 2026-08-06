@@ -12,7 +12,7 @@ export async function bootAdmin() {
   if (sessionStorage.getItem('admin_logged') !== 'true') return;
 
   await Storage.initCloud({ full: true });
-  Storage.startCloudPolling(5000);
+  Storage.startCloudPolling(); // desativado (Hostinger: limite de processos)
   updateSyncBadge();
 
   initSidebar();

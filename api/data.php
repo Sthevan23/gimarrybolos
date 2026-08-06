@@ -15,6 +15,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $file = __DIR__ . '/data.json';
 
+// Se o site estiver OFF, não gasta processo com JSON/banco
+$siteOff = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'SITE_OFF';
+if (is_file($siteOff)) {
+  http_response_code(503);
+  header('Content-Type: application/json; charset=utf-8');
+  header('Retry-After: 3600');
+  echo '{"ok":false,"offline":true}';
+  exit;
+}
+
 function read_data($file) {
   if (!file_exists($file)) {
     return null;
