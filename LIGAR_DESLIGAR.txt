@@ -1,19 +1,18 @@
-LIGAR / DESLIGAR SITES (Hostinger)
-==================================
+LIGAR / DESLIGAR — Gimarry
+==========================
 
-Limite crítico: Máximo de processos = 120 (compartilhado por TODOS os sites).
+PAINEL (agora DESLIGADO)
+------------------------
+Arquivo na raiz: PAINEL_OFF
 
-AGORA: sites LIGADOS e leves (sem SITE_OFF).
+• Site continua no ar
+• /admin e API do painel ficam bloqueados
 
-Para PAUSAR um site (se precisar aliviar de novo):
-1. Crie um arquivo vazio chamado SITE_OFF na raiz do site
-2. Commit/push (ou suba no File Manager)
+Para ATIVAR o painel de novo:
+1. Apague o arquivo PAINEL_OFF
+2. Commit/push (auto deploy) OU delete no File Manager
 
-Para LIGAR de novo:
-1. Apague SITE_OFF
-
-Regras pra NÃO derrubar os outros:
-- Não deixar painel /admin aberto 24h
-- Sem polling automático (já desligado)
-- Visitante não chama PHP a cada página (já no código)
-- No hPanel: "Parar processos" se o medidor subir
+SITE INTEIRO
+------------
+Arquivo SITE_OFF → pausa tudo (site + painel)
+Apague SITE_OFF para religar

@@ -25,6 +25,19 @@ if (is_file($siteOff)) {
   exit;
 }
 
+// Painel OFF: bloqueia API admin (login/full/save)
+$painelOff = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'PAINEL_OFF';
+if (is_file($painelOff)) {
+  $wantAdmin = isset($_GET['full'])
+    || (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST');
+  if ($wantAdmin) {
+    http_response_code(503);
+    header('Content-Type: application/json; charset=utf-8');
+    echo '{"ok":false,"painel_off":true}';
+    exit;
+  }
+}
+
 function read_data($file) {
   if (!file_exists($file)) {
     return null;

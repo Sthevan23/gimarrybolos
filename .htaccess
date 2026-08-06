@@ -1,8 +1,6 @@
-# Gimarry Bolos — cache, segurança e modo OFF (menos processos Hostinger)
+# Gimarry Bolos — cache, segurança e modos OFF
 
-# ---- MODO OFF (arquivo SITE_OFF na raiz) ----
-# Com SITE_OFF: site/admin/API/fotos ficam off → página leve (quase 0 processo).
-# Para LIGAR: apague SITE_OFF.
+# ---- SITE OFF (arquivo SITE_OFF) → site inteiro pausado ----
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
@@ -11,13 +9,24 @@
   RewriteRule ^ offline.html [L]
 </IfModule>
 
+# ---- PAINEL OFF (arquivo PAINEL_OFF) → só /admin pausado ----
+# Site continua no ar. Para religar o painel: apague PAINEL_OFF.
+<IfModule mod_rewrite.c>
+  RewriteCond %{DOCUMENT_ROOT}/PAINEL_OFF -f
+  RewriteCond %{REQUEST_URI} !/painel-off\.html$ [NC]
+  RewriteRule ^admin(/|$) painel-off.html [L,NC]
+
+  RewriteCond %{DOCUMENT_ROOT}/PAINEL_OFF -f
+  RewriteRule ^api/data\.php$ - [F,L]
+</IfModule>
+
 # Bloqueia bots agressivos (cada hit = processo)
 <IfModule mod_rewrite.c>
   RewriteCond %{HTTP_USER_AGENT} (AhrefsBot|SemrushBot|DotBot|MJ12bot|Bytespider|PetalBot|ClaudeBot|GPTBot|CCBot|DataForSeo|BLEXBot|Zoominfo|Scrapy) [NC]
   RewriteRule .* - [F,L]
 </IfModule>
 
-# PHP na API: saída rápida se SITE_OFF (fallback se rewrite falhar)
+# PHP na API: saída rápida se SITE_OFF
 <IfModule mod_rewrite.c>
   RewriteCond %{DOCUMENT_ROOT}/SITE_OFF -f
   RewriteRule ^api/.*\.php$ - [F,L]
