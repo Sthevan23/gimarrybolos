@@ -48,4 +48,4 @@
   AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
 </IfModule>
 
-RedirectMatch 404 (?i)/(backend|node_modules|\.git|docs)/
+RedirectMatch 404 (?i)/(backend|node_modules|\.git|docs|frontend)/

@@ -27,7 +27,7 @@
   ];
   const MAX_FILLINGS = 2;
   const TOPPER_PRICE = 25;
-  const INITIAL_PRODUCTS_LIMIT = 6;
+  const INITIAL_PRODUCTS_LIMIT = 4;
   let activeCategory = "todos";
   let visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
   let galleryExpanded = false;
@@ -179,18 +179,18 @@
     document.getElementById("order-pickup").textContent =
       `Retire em ${S.address}. Atendimento combinado pelo WhatsApp.`;
 
-    document.getElementById("hero-bg").style.backgroundImage = `url('${encodeURI(S.heroImage)}')`;
+    document.getElementById("hero-bg").style.backgroundImage = `url('${encodeURI(thumbSrc(S.heroImage))}')`;
     const sobreImg = document.getElementById("sobre-image");
     if (sobreImg) {
       sobreImg.loading = "lazy";
       sobreImg.decoding = "async";
-      sobreImg.src = encodeURI(S.aboutImage);
+      sobreImg.src = encodeURI(thumbSrc(S.aboutImage));
     }
     const contactImg = document.getElementById("contact-image");
     if (contactImg) {
       contactImg.loading = "lazy";
       contactImg.decoding = "async";
-      contactImg.src = encodeURI(S.contactImage);
+      contactImg.src = encodeURI(thumbSrc(S.contactImage));
     }
 
     const sobre = document.getElementById("sobre-text");
