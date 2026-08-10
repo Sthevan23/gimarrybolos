@@ -386,10 +386,16 @@
       : gallery.slice(0, INITIAL_PRODUCTS_LIMIT);
 
     document.getElementById("gallery-grid").innerHTML = visibleGallery
-      .map(
-        (src, i) =>
-          `<figure><img src="${thumbSrc(src)}" alt="Foto ${i + 1} da galeria" loading="lazy" decoding="async" width="480" height="600"></figure>`
-      )
+      .map((src, i) => {
+        const product = productForGallerySrc(src, i);
+        const label = product.name || `Modelo ${i + 1}`;
+        return `<figure class="gallery__item">
+          <button type="button" class="gallery__hit" data-gallery-index="${i}" data-gallery-src="${String(src).replace(/"/g, "&quot;")}" aria-label="Encomendar ${label}">
+            <img src="${thumbSrc(src)}" alt="${label}" loading="lazy" decoding="async" width="480" height="600">
+            <span class="gallery__hit-label">Encomendar</span>
+          </button>
+        </figure>`;
+      })
       .join("");
 
     const actions = document.getElementById("gallery-actions");
@@ -400,8 +406,29 @@
   }
 
   /* ---------- lightbox ---------- */
-  function openLightbox(id) {
-    const p = catalogProducts().find((x) => x.id === id);
+  function productForGallerySrc(src, index) {
+    const products = catalogProducts();
+    const exact = products.find((p) => String(p.image) === String(src));
+    if (exact) return { ...exact, image: src };
+    const base = String(src).split("/").pop();
+    const byBase = products.find((p) => String(p.image).split("/").pop() === base);
+    if (byBase) return { ...byBase, image: src };
+    return {
+      id: `gallery-${index + 1}`,
+      name: "Modelo da galeria",
+      description: "Inspiração da galeria — monte com massa, recheio e tamanho para encomendar.",
+      category: "bolos",
+      flavors: [],
+      image: src,
+      bestSeller: false,
+    };
+  }
+
+  function openLightbox(idOrProduct) {
+    const p =
+      idOrProduct && typeof idOrProduct === "object"
+        ? idOrProduct
+        : catalogProducts().find((x) => x.id === idOrProduct);
     if (!p) return;
     lightboxProduct = p;
     lightboxQty = 1;
@@ -1010,6 +1037,13 @@
     });
 
     document.addEventListener("click", (e) => {
+      const galleryHit = e.target.closest("[data-gallery-src]");
+      if (galleryHit) {
+        const src = galleryHit.getAttribute("data-gallery-src") || "";
+        const index = Number(galleryHit.dataset.galleryIndex || 0);
+        openLightbox(productForGallerySrc(src, index));
+        return;
+      }
       const openBtn = e.target.closest("[data-open]");
       if (openBtn) {
         openLightbox(openBtn.dataset.open);

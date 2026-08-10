@@ -1178,16 +1178,59 @@ p {
   object-fit: cover;
   border-radius: var(--radius-md);
   transition: transform 400ms var(--ease-out);
+  display: block;
 }
 
-.gallery__grid figure {
+.gallery__grid figure,
+.gallery__item {
   overflow: hidden;
   border-radius: var(--radius-md);
   margin: 0;
 }
 
-.gallery__grid figure:hover img {
+.gallery__hit {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.gallery__hit:focus-visible {
+  outline: 2px solid var(--color-accent, #c45c6a);
+  outline-offset: 3px;
+}
+
+.gallery__hit-label {
+  position: absolute;
+  left: 50%;
+  bottom: 0.75rem;
+  transform: translateX(-50%) translateY(0.35rem);
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(28, 18, 16, 0.78);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+}
+
+.gallery__hit:hover img,
+.gallery__hit:focus-visible img {
   transform: scale(1.05);
+}
+
+.gallery__hit:hover .gallery__hit-label,
+.gallery__hit:focus-visible .gallery__hit-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 @media (max-width: 700px) {
