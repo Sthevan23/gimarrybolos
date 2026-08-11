@@ -40,54 +40,15 @@
   let heroWordIndex = 0;
 
   function catalogCategories() {
-    if (typeof Storage !== "undefined") {
-      const cats = Storage.getCategories() || [];
-      if (cats.length) {
-        return [
-          { id: "todos", name: "Todos" },
-          ...cats.map((c) => ({
-            id: c.slug || String(c.id || "").replace(/^cat-/, ""),
-            name: c.name,
-          })),
-        ];
-      }
-    }
-    return SITE_DATA.categories;
+    return SITE_DATA.categories || [];
   }
 
   function catalogProducts() {
-    if (typeof Storage !== "undefined") {
-      const list = Storage.getProducts() || [];
-      if (list.length) {
-        const cats = Storage.getCategories() || [];
-        return list
-          .filter((p) => p.active !== false)
-          .map((p) => {
-            const cat = cats.find((c) => c.id === p.categoryId);
-            const slug =
-              p.category ||
-              cat?.slug ||
-              String(p.categoryId || "").replace(/^cat-/, "") ||
-              "bolos";
-            return {
-              ...p,
-              category: slug,
-              bestSeller: p.bestSeller ?? p.featured,
-              flavors: Array.isArray(p.flavors) ? p.flavors : [],
-            };
-          });
-      }
-    }
-    return SITE_DATA.products;
+    return SITE_DATA.products || [];
   }
 
   function catalogGallery() {
-    if (typeof Storage !== "undefined") {
-      const g = Storage.getGallery();
-      if (Array.isArray(g) && g.length) return g.slice(0, 24);
-    }
-    const g = SITE_DATA.gallery || [];
-    return g.slice(0, 24);
+    return (SITE_DATA.gallery || []).slice(0, 24);
   }
 
   /* ---------- helpers ---------- */
@@ -1110,8 +1071,7 @@
   }
 
   /* ---------- init ---------- */
-  async function boot() {
-    // Pinta na hora com seed local — API atualiza em background (menos espera)
+  function boot() {
     hydrateBrand();
     buildMarquee();
     rotateHeroWords();
@@ -1121,21 +1081,6 @@
     renderCart();
     setupContact();
     setupChrome();
-
-    if (typeof Storage !== "undefined") {
-      try {
-        await Storage.initCloud({ full: false });
-        renderFilters();
-        renderProducts();
-        renderGallery();
-      } catch { /* seed local já está ok */ }
-    }
-
-    window.addEventListener("storage-updated", () => {
-      renderFilters();
-      renderProducts();
-      renderGallery();
-    });
   }
 
   boot();

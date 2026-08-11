@@ -1,8 +1,1 @@
-node_modules/
 .preview/
-backend/config/.env.hostinger
-api/CONEXAO_HOSTINGER.txt
-
-# Build/artefatos — site ao vivo usa a raiz (fotos_bolos). Economiza ~5MB no Hostinger.
-frontend/public/
-

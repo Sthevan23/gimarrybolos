@@ -1,9 +1,0 @@
-RewriteEngine On
-
-# Bloquear acesso a pastas sensíveis
-RewriteRule ^(src|config|storage|database|vendor)/ - [F,L]
-RewriteRule \.env$ - [F,L]
-
-# API REST → index.php
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^ index.php [QSA,L]

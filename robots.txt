@@ -1,8 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /api/
-Disallow: /admin/
-Disallow: /backend/
 Disallow: /fotos_bolos/
 Crawl-delay: 10
 

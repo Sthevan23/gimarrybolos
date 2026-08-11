@@ -1,6 +1,0 @@
-# Se o document root apontar para backend/ (não recomendado),
-# redireciona tudo para public/
-RewriteEngine On
-RewriteRule ^(src|config|storage|database)/ - [F,L]
-RewriteRule \.env$ - [F,L]
-RewriteRule ^(.*)$ public/$1 [L]
