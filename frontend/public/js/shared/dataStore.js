@@ -336,14 +336,9 @@ async function createPublicOrder({ fullName, whatsapp, items, total, notes }) {
   }
 }
 
-function startCloudPolling(intervalMs = 5000) {
+function startCloudPolling() {
+  // OFF — Hostinger LVE: polling derruba Máximo de processos (120)
   stopCloudPolling();
-  pollTimer = setInterval(() => {
-    pullFull();
-  }, intervalMs);
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') pullFull();
-  });
 }
 
 function stopCloudPolling() {
