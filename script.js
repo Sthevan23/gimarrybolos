@@ -439,7 +439,7 @@
     lightboxSize = isCustomCake(p) ? CAKE_SIZES[0] : null;
     lightboxTopper = false;
 
-    document.getElementById("lightbox-img").src = imgSrc(p.image);
+    document.getElementById("lightbox-img").src = thumbSrc(p.image);
     document.getElementById("lightbox-img").alt = p.name;
     document.getElementById("lightbox-category").textContent = categoryName(p.category);
     document.getElementById("lightbox-title").textContent = p.name;
