@@ -28,6 +28,7 @@
   const MAX_FILLINGS = 2;
   const TOPPER_PRICE = 25;
   const INITIAL_PRODUCTS_LIMIT = 4;
+  const GALLERY_LIMIT = 8;
   let activeCategory = "todos";
   let visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
   let galleryExpanded = false;
@@ -48,7 +49,7 @@
   }
 
   function catalogGallery() {
-    return (SITE_DATA.gallery || []).slice(0, 24);
+    return (SITE_DATA.gallery || []).slice(0, GALLERY_LIMIT);
   }
 
   /* ---------- helpers ---------- */
@@ -109,8 +110,8 @@
     const el = document.getElementById("cart-feedback");
     if (!el) return;
     el.innerHTML = withCartLink
-      ? `<span class="cart-feedback__left"><span class="cart-feedback__check"><i class="fa-solid fa-check"></i></span><span class="cart-feedback__text">${msg}</span></span><a class="cart-feedback__btn" href="cart.html">Ver carrinho</a>`
-      : `<span class="cart-feedback__left"><span class="cart-feedback__check"><i class="fa-solid fa-check"></i></span><span class="cart-feedback__text">${msg}</span></span>`;
+      ? `<span class="cart-feedback__left"><span class="cart-feedback__check" aria-hidden="true">✓</span><span class="cart-feedback__text">${msg}</span></span><a class="cart-feedback__btn" href="cart.html">Ver carrinho</a>`
+      : `<span class="cart-feedback__left"><span class="cart-feedback__check" aria-hidden="true">✓</span><span class="cart-feedback__text">${msg}</span></span>`;
     el.hidden = false;
     el.classList.add("is-visible");
     clearTimeout(toast._t);
@@ -229,7 +230,7 @@
             </div>
             <button type="button" class="product-card__add" data-open="${p.id}">
               <span>Adicionar</span>
-              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              <span class="ico ico--plus" aria-hidden="true"></span>
             </button>
           </div>
         </div>
@@ -335,7 +336,7 @@
       collapseBtn.hidden = visibleList.length <= INITIAL_PRODUCTS_LIMIT;
     }
 
-    const best = catalogProducts().filter((p) => p.bestSeller).slice(0, 4);
+    const best = catalogProducts().filter((p) => p.bestSeller).slice(0, 3);
     document.getElementById("bestsellers-grid").innerHTML = best.map(cardHTML).join("");
   }
 
@@ -783,7 +784,7 @@
             </div>
             ${line > 0 ? `<strong class="cart-item__price">${money(line)}</strong>` : ""}
             <button type="button" class="cart-item__remove" data-remove="${i.key}" aria-label="Remover">
-              <i class="fa-solid fa-trash" aria-hidden="true"></i>
+              <span class="ico ico--trash" aria-hidden="true"></span>
             </button>
           </div>
         </div>

@@ -23,7 +23,12 @@
     if (!path) return FALLBACK_IMG;
     const raw = String(path).trim();
     if (/^(data:|blob:|https?:)/i.test(raw)) return raw;
-    return raw.replace(/^\//, '');
+    const cleaned = raw.replace(/^\//, '');
+    if (!cleaned.startsWith('fotos_bolos/')) return cleaned;
+    const rest = cleaned.slice('fotos_bolos/'.length);
+    if (rest.startsWith('_thumbs/')) return cleaned;
+    const noExt = rest.replace(/\.(jpe?g|png|webp)$/i, '');
+    return `fotos_bolos/_thumbs/${noExt}.jpg`;
   }
 
   function onlyDigits(v) {
@@ -45,7 +50,7 @@
   function showFeedback(message) {
     const el = document.getElementById('cart-feedback');
     if (!el) return;
-    el.innerHTML = `<span class="cart-feedback__left"><span class="cart-feedback__check"><i class="fa-solid fa-check"></i></span><span class="cart-feedback__text">${message}</span></span>`;
+    el.innerHTML = `<span class="cart-feedback__left"><span class="cart-feedback__check" aria-hidden="true">✓</span><span class="cart-feedback__text">${message}</span></span>`;
     el.hidden = false;
     el.classList.add('is-visible');
     clearTimeout(showFeedback._t);
@@ -139,7 +144,7 @@
       const line = (Number(item.price) || 0) * (Number(item.qty) || 0);
       const meta = [item.size, item.flavor].filter(Boolean).join(' · ');
       const notes = item.notes
-        ? `<p class="cart-line__notes"><i class="fa-regular fa-comment"></i> ${escapeHtml(item.notes)}</p>`
+        ? `<p class="cart-line__notes">${escapeHtml(item.notes)}</p>`
         : '';
       return `
         <article class="cart-line" data-key="${escapeHtml(item.key)}">
@@ -151,7 +156,7 @@
             <div class="cart-line__top">
               <h3 class="cart-line__name">${escapeHtml(item.name)}</h3>
               <button type="button" class="cart-line__remove" data-remove="${escapeHtml(item.key)}" aria-label="Remover">
-                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                <span class="ico ico--trash" aria-hidden="true"></span>
               </button>
             </div>
             ${meta ? `<p class="cart-line__meta">${escapeHtml(meta)}</p>` : ''}
