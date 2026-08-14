@@ -4,21 +4,7 @@
   const Cart = window.AuroraCart;
   const money = (n) =>
     Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  const CAKE_FILLINGS = [
-    "Brigadeiro",
-    "Brigadeiro branco",
-    "Brigadeiro & morango",
-    "Doce de leite",
-    "Paçoca",
-    "Coco",
-    "Doce de leite / abacaxi",
-    "Ninho",
-    "Caramelo salgado",
-    "Creme de avelã",
-    "Ouro Branco",
-    "Pistache",
-    "Ferrero",
-  ];
+  const CAKE_FILLINGS = ["Ninho", "Brigadeiro"];
   const CAKE_BATTERS = ["Branca", "Chocolate"];
   const CAKE_SIZES = [
     { label: "Bolo parabéns", detail: "serve 7 fatias", price: 65 },
@@ -416,7 +402,7 @@
       flavorsEl.innerHTML = [
         accordionSection({
           id: "acc-fillings",
-          title: `Escolha até ${MAX_FILLINGS} recheios *`,
+          title: "Escolha até 2 sabores *",
           summary: "obrigatório",
           open: true,
           body: `
@@ -497,7 +483,7 @@
           if (checked.length > MAX_FILLINGS) {
             input.checked = false;
             const err = document.getElementById("order-error");
-            err.textContent = `Escolha no máximo ${MAX_FILLINGS} recheios.`;
+            err.textContent = `Escolha no máximo ${MAX_FILLINGS} sabores.`;
             err.hidden = false;
             return;
           }
@@ -653,7 +639,7 @@
     if (!lightboxProduct || !Cart) return;
     if (isCustomCake(lightboxProduct) && lightboxFlavors.length === 0) {
       const err = document.getElementById("order-error");
-      err.textContent = "Escolha pelo menos 1 recheio.";
+      err.textContent = "Escolha pelo menos 1 sabor.";
       err.hidden = false;
       openAccordion("acc-fillings");
       return;
