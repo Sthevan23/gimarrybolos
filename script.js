@@ -4,7 +4,21 @@
   const Cart = window.AuroraCart;
   const money = (n) =>
     Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  const CAKE_FILLINGS = ["Ninho", "Brigadeiro"];
+  const CAKE_FILLINGS = [
+    "Brigadeiro",
+    "Brigadeiro branco",
+    "Brigadeiro & morango",
+    "Doce de leite",
+    "Paçoca",
+    "Coco",
+    "Doce de leite / abacaxi",
+    "Ninho",
+    "Caramelo salgado",
+    "Creme de avelã",
+    "Ouro Branco",
+    "Pistache",
+    "Ferrero",
+  ];
   const CAKE_BATTERS = ["Branca", "Chocolate"];
   const CAKE_SIZES = [
     { label: "Bolo parabéns", detail: "serve 7 fatias", price: 65 },
@@ -402,7 +416,7 @@
       flavorsEl.innerHTML = [
         accordionSection({
           id: "acc-fillings",
-          title: "Escolha até 2 sabores *",
+          title: `Escolha até ${MAX_FILLINGS} recheios *`,
           summary: "obrigatório",
           open: true,
           body: `
@@ -477,20 +491,31 @@
 
       bindLightboxAccordions(flavorsEl);
 
+      function syncFillingLimit() {
+        const inputs = [...flavorsEl.querySelectorAll('input[name="flavor"]')];
+        const checked = inputs.filter((item) => item.checked);
+        const limitReached = checked.length >= MAX_FILLINGS;
+        inputs.forEach((item) => {
+          item.disabled = limitReached && !item.checked;
+        });
+        lightboxFlavors = checked.map((item) => item.value);
+      }
+
       flavorsEl.querySelectorAll('input[name="flavor"]').forEach((input) => {
         input.addEventListener("change", () => {
           const checked = [...flavorsEl.querySelectorAll('input[name="flavor"]:checked')];
           if (checked.length > MAX_FILLINGS) {
             input.checked = false;
             const err = document.getElementById("order-error");
-            err.textContent = `Escolha no máximo ${MAX_FILLINGS} sabores.`;
+            err.textContent = `Escolha no máximo ${MAX_FILLINGS} recheios.`;
             err.hidden = false;
+            syncFillingLimit();
             return;
           }
-          lightboxFlavors = checked.map((item) => item.value);
           document.getElementById("order-error").hidden = true;
+          syncFillingLimit();
           updateLightboxAccordions();
-          if (lightboxFlavors.length > 0) {
+          if (lightboxFlavors.length >= MAX_FILLINGS) {
             setAccordionState("acc-fillings", { open: false, done: true });
             openAccordion("acc-batter");
           }
@@ -639,7 +664,7 @@
     if (!lightboxProduct || !Cart) return;
     if (isCustomCake(lightboxProduct) && lightboxFlavors.length === 0) {
       const err = document.getElementById("order-error");
-      err.textContent = "Escolha pelo menos 1 sabor.";
+      err.textContent = "Escolha pelo menos 1 recheio.";
       err.hidden = false;
       openAccordion("acc-fillings");
       return;

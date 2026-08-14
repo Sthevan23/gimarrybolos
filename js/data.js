@@ -59,7 +59,8 @@ const SITE_DATA = {
       "bestSeller": true,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.11 (1).jpeg"
     },
@@ -71,7 +72,8 @@ const SITE_DATA = {
       "bestSeller": true,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.11.jpeg"
     },
@@ -83,7 +85,8 @@ const SITE_DATA = {
       "bestSeller": true,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.12 (1).jpeg"
     },
@@ -95,7 +98,8 @@ const SITE_DATA = {
       "bestSeller": true,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.12 (2).jpeg"
     },
@@ -107,7 +111,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.12 (3).jpeg"
     },
@@ -119,7 +124,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.12 (4).jpeg"
     },
@@ -131,7 +137,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.12.jpeg"
     },
@@ -143,7 +150,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.13 (1).jpeg"
     },
@@ -155,7 +163,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.13 (2).jpeg"
     },
@@ -167,7 +176,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.13 (3).jpeg"
     },
@@ -179,7 +189,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.13.jpeg"
     },
@@ -191,7 +202,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.14 (1).jpeg"
     },
@@ -203,7 +215,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.14 (2).jpeg"
     },
@@ -215,7 +228,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.14 (3).jpeg"
     },
@@ -227,7 +241,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.14 (4).jpeg"
     },
@@ -239,7 +254,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.14.jpeg"
     },
@@ -251,7 +267,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.15 (1).jpeg"
     },
@@ -263,7 +280,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.15 (2).jpeg"
     },
@@ -275,7 +293,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.15 (3).jpeg"
     },
@@ -287,7 +306,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.15 (4).jpeg"
     },
@@ -299,7 +319,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.15.jpeg"
     },
@@ -311,7 +332,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.16 (1).jpeg"
     },
@@ -323,7 +345,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.16 (2).jpeg"
     },
@@ -335,7 +358,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.16 (3).jpeg"
     },
@@ -347,7 +371,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.16 (4).jpeg"
     },
@@ -359,7 +384,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.16 (5).jpeg"
     },
@@ -371,7 +397,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.16.jpeg"
     },
@@ -383,7 +410,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.17 (1).jpeg"
     },
@@ -395,7 +423,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.17.jpeg"
     },
@@ -407,7 +436,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.04 (1).jpeg"
     },
@@ -419,7 +449,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.04.jpeg"
     },
@@ -431,7 +462,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.05 (1).jpeg"
     },
@@ -443,7 +475,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.05 (2).jpeg"
     },
@@ -455,7 +488,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.05 (3).jpeg"
     },
@@ -467,7 +501,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.05 (4).jpeg"
     },
@@ -479,7 +514,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.05.jpeg"
     },
@@ -491,7 +527,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.06 (1).jpeg"
     },
@@ -503,7 +540,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.06 (2).jpeg"
     },
@@ -515,7 +553,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.06 (3).jpeg"
     },
@@ -527,7 +566,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.06 (4).jpeg"
     },
@@ -539,7 +579,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.06.jpeg"
     },
@@ -551,7 +592,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.07 (1).jpeg"
     },
@@ -563,7 +605,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.07 (2).jpeg"
     },
@@ -575,7 +618,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.07 (3).jpeg"
     },
@@ -587,7 +631,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.07 (4).jpeg"
     },
@@ -599,7 +644,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.07.jpeg"
     },
@@ -611,7 +657,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.08 (1).jpeg"
     },
@@ -623,7 +670,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.08 (2).jpeg"
     },
@@ -635,7 +683,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.08 (3).jpeg"
     },
@@ -647,7 +696,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.08 (4).jpeg"
     },
@@ -659,7 +709,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.08.jpeg"
     },
@@ -671,7 +722,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.09 (1).jpeg"
     },
@@ -683,7 +735,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.09 (2).jpeg"
     },
@@ -695,7 +748,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.09 (3).jpeg"
     },
@@ -707,7 +761,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.09 (4).jpeg"
     },
@@ -719,7 +774,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.09.jpeg"
     },
@@ -731,7 +787,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.10 (1).jpeg"
     },
@@ -743,7 +800,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.10 (2).jpeg"
     },
@@ -755,7 +813,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.10 (3).jpeg"
     },
@@ -767,7 +826,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.10.10.jpeg"
     },
@@ -779,7 +839,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.05.jpeg"
     },
@@ -791,7 +852,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.06 (1).jpeg"
     },
@@ -803,7 +865,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.06 (2).jpeg"
     },
@@ -815,7 +878,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.06 (3).jpeg"
     },
@@ -827,7 +891,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.06.jpeg"
     },
@@ -839,7 +904,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.07 (1).jpeg"
     },
@@ -851,7 +917,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.07 (2).jpeg"
     },
@@ -863,7 +930,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.07 (3).jpeg"
     },
@@ -875,7 +943,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.07 (4).jpeg"
     },
@@ -887,7 +956,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.07 (5).jpeg"
     },
@@ -899,7 +969,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.07.jpeg"
     },
@@ -911,7 +982,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.08 (1).jpeg"
     },
@@ -923,7 +995,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.08 (2).jpeg"
     },
@@ -935,7 +1008,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.08 (3).jpeg"
     },
@@ -947,7 +1021,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.08 (4).jpeg"
     },
@@ -959,7 +1034,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.08.jpeg"
     },
@@ -971,7 +1047,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.09 (1).jpeg"
     },
@@ -983,7 +1060,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.09 (2).jpeg"
     },
@@ -995,7 +1073,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.09 (3).jpeg"
     },
@@ -1007,7 +1086,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.09 (4).jpeg"
     },
@@ -1019,7 +1099,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.09.jpeg"
     },
@@ -1031,7 +1112,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.10 (1).jpeg"
     },
@@ -1043,7 +1125,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.10 (2).jpeg"
     },
@@ -1055,7 +1138,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.10 (3).jpeg"
     },
@@ -1067,7 +1151,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.10 (4).jpeg"
     },
@@ -1079,7 +1164,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.10.jpeg"
     },
@@ -1091,7 +1177,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.11 (1).jpeg"
     },
@@ -1103,7 +1190,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.11 (2).jpeg"
     },
@@ -1115,7 +1203,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.11 (3).jpeg"
     },
@@ -1127,7 +1216,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.11 (4).jpeg"
     },
@@ -1139,7 +1229,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.11.jpeg"
     },
@@ -1151,7 +1242,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.12 (1).jpeg"
     },
@@ -1163,7 +1255,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.12 (2).jpeg"
     },
@@ -1175,7 +1268,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.12 (3).jpeg"
     },
@@ -1187,7 +1281,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.12 (4).jpeg"
     },
@@ -1199,7 +1294,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.12.jpeg"
     },
@@ -1211,7 +1307,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.13 (1).jpeg"
     },
@@ -1223,7 +1320,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.13 (2).jpeg"
     },
@@ -1235,7 +1333,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.13.13.jpeg"
     },
@@ -1247,7 +1346,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/bento_kits/Captura de tela 2026-07-08 150756.png"
     },
@@ -1259,7 +1359,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/bento_kits/WhatsApp Image 2026-07-08 at 08.58.37 (1).jpeg"
     },
@@ -1271,7 +1372,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/bento_kits/WhatsApp Image 2026-07-08 at 09.07.44.jpeg"
     },
@@ -1283,7 +1385,8 @@ const SITE_DATA = {
       "bestSeller": true,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.27 (1).jpeg"
     },
@@ -1295,7 +1398,8 @@ const SITE_DATA = {
       "bestSeller": true,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.27 (2).jpeg"
     },
@@ -1307,7 +1411,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.27 (3).jpeg"
     },
@@ -1319,7 +1424,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.27 (4).jpeg"
     },
@@ -1331,7 +1437,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.27.jpeg"
     },
@@ -1343,7 +1450,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.28 (1).jpeg"
     },
@@ -1355,7 +1463,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.28 (2).jpeg"
     },
@@ -1367,7 +1476,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.28 (3).jpeg"
     },
@@ -1379,7 +1489,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.28 (4).jpeg"
     },
@@ -1391,7 +1502,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.28.jpeg"
     },
@@ -1403,7 +1515,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_bentocake/WhatsApp Image 2026-07-08 at 13.05.29.jpeg"
     },
@@ -1415,7 +1528,8 @@ const SITE_DATA = {
       "bestSeller": true,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_destaques/WhatsApp Image 2026-07-08 at 12.55.35.jpeg"
     },
@@ -1427,7 +1541,8 @@ const SITE_DATA = {
       "bestSeller": true,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_destaques/WhatsApp Image 2026-07-08 at 12.56.11.jpeg"
     },
@@ -1439,7 +1554,8 @@ const SITE_DATA = {
       "bestSeller": true,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_destaques/WhatsApp Image 2026-07-08 at 12.56.41.jpeg"
     },
@@ -1451,7 +1567,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_destaques/WhatsApp Image 2026-07-08 at 12.56.55.jpeg"
     },
@@ -1463,7 +1580,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_destaques/WhatsApp Image 2026-07-08 at 12.57.09.jpeg"
     },
@@ -1475,7 +1593,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_destaques/WhatsApp Image 2026-07-08 at 12.57.29.jpeg"
     },
@@ -1487,7 +1606,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_destaques/WhatsApp Image 2026-07-08 at 12.58.03.jpeg"
     },
@@ -1499,7 +1619,8 @@ const SITE_DATA = {
       "bestSeller": false,
       "flavors": [
         "Ninho",
-        "Brigadeiro"
+        "Brigadeiro",
+        "Morango"
       ],
       "image": "fotos_bolos/bolos_destaques/WhatsApp Image 2026-07-08 at 12.58.57.jpeg"
     },
