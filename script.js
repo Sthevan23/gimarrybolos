@@ -100,6 +100,10 @@
     return ["bolos", "destaques"].includes(product?.category);
   }
 
+  function isReadyCake(product) {
+    return product?.category === "pronta";
+  }
+
   function isBentoCake(product) {
     return product?.category === "bento";
   }
@@ -223,10 +227,9 @@
           <span class="product-card__category">${categoryName(p.category)}</span>
           <h3 class="product-card__name">${p.name}</h3>
           <p class="product-card__desc">${p.description}</p>
-          <div class="product-card__footer">
+            <div class="product-card__footer">
             <div class="product-card__meta">
               ${p.size ? `<span class="product-card__size">${p.size}</span>` : ""}
-              ${p.flavors?.length ? `<span class="product-card__flavors">${p.flavors.length} sabores</span>` : `<span class="product-card__flavors">Sob consulta</span>`}
             </div>
             <button type="button" class="product-card__add" data-open="${p.id}">
               <span>Adicionar</span>
@@ -285,29 +288,33 @@
   }
 
   function updateLightboxAccordions() {
-    if (!lightboxProduct || !isCustomCake(lightboxProduct)) return;
+    if (!lightboxProduct) return;
 
-    const fillingsDone = lightboxFlavors.length > 0;
-    setAccordionSummary(
-      "acc-fillings",
-      fillingsDone ? lightboxFlavors.join(" / ") : "obrigatório"
-    );
-    setAccordionState("acc-fillings", { done: fillingsDone });
+    if (isCustomCake(lightboxProduct)) {
+      const fillingsDone = lightboxFlavors.length > 0;
+      setAccordionSummary(
+        "acc-fillings",
+        fillingsDone ? lightboxFlavors.join(" / ") : "obrigatório"
+      );
+      setAccordionState("acc-fillings", { done: fillingsDone });
 
-    setAccordionSummary("acc-batter", lightboxBatter || "obrigatório");
-    setAccordionState("acc-batter", { done: Boolean(lightboxBatter) });
+      setAccordionSummary("acc-batter", lightboxBatter || "obrigatório");
+      setAccordionState("acc-batter", { done: Boolean(lightboxBatter) });
 
-    const sizeSummary = lightboxSize
-      ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
-      : "obrigatório";
-    setAccordionSummary("acc-size", sizeSummary);
-    setAccordionState("acc-size", { done: Boolean(lightboxSize) });
+      setAccordionSummary(
+        "acc-extra",
+        lightboxTopper ? `+ ${money(TOPPER_PRICE)}` : "opcional"
+      );
+      setAccordionState("acc-extra", { done: lightboxTopper });
+    }
 
-    setAccordionSummary(
-      "acc-extra",
-      lightboxTopper ? `+ ${money(TOPPER_PRICE)}` : "opcional"
-    );
-    setAccordionState("acc-extra", { done: lightboxTopper });
+    if (isReadyCake(lightboxProduct)) {
+      const sizeSummary = lightboxSize
+        ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
+        : "obrigatório";
+      setAccordionSummary("acc-size", sizeSummary);
+      setAccordionState("acc-size", { done: Boolean(lightboxSize) });
+    }
   }
 
   function renderProducts() {
@@ -398,7 +405,7 @@
       ? []
       : (p.flavors?.[0] ? [p.flavors[0]] : []);
     lightboxBatter = isCustomCake(p) ? CAKE_BATTERS[0] : "";
-    lightboxSize = isCustomCake(p) ? CAKE_SIZES[0] : null;
+    lightboxSize = isReadyCake(p) ? CAKE_SIZES[0] : null;
     lightboxTopper = false;
 
     document.getElementById("lightbox-img").src = thumbSrc(p.image);
@@ -445,29 +452,6 @@
                   <input type="radio" name="batter" value="${b}" ${i === 0 ? "checked" : ""}>
                   <span class="flavor-option__mark" aria-hidden="true"></span>
                   <span class="flavor-option__text">${b}</span>
-                </label>`
-              ).join("")}
-            </div>`,
-        }),
-        accordionSection({
-          id: "acc-size",
-          title: "Linha Celebre — tamanho *",
-          summary: lightboxSize
-            ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
-            : "obrigatório",
-          open: false,
-          done: true,
-          body: `
-            <div class="size-list">
-              ${CAKE_SIZES.map(
-                (size, i) => `
-                <label class="size-option">
-                  <input type="radio" name="cake-size" value="${size.label}" data-price="${size.price}" data-detail="${size.detail}" ${i === 0 ? "checked" : ""}>
-                  <span class="size-option__content">
-                    <strong>${size.label}</strong>
-                    <small>${size.detail}</small>
-                  </span>
-                  <b>${money(size.price)}</b>
                 </label>`
               ).join("")}
             </div>`,
@@ -526,9 +510,41 @@
           lightboxBatter = input.value;
           updateLightboxAccordions();
           setAccordionState("acc-batter", { open: false, done: true });
-          openAccordion("acc-size");
+          openAccordion("acc-extra");
         });
       });
+      flavorsEl.querySelector("#lightbox-topper")?.addEventListener("change", (event) => {
+        lightboxTopper = Boolean(event.target.checked);
+        updateLightboxAccordions();
+        updateLightboxQty();
+      });
+    } else if (isReadyCake(p)) {
+      flavorsEl.hidden = false;
+      flavorsEl.innerHTML = accordionSection({
+        id: "acc-size",
+        title: "Linha Celebre — tamanho *",
+        summary: lightboxSize
+          ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
+          : "obrigatório",
+        open: true,
+        done: Boolean(lightboxSize),
+        body: `
+          <div class="size-list">
+            ${CAKE_SIZES.map(
+              (size, i) => `
+              <label class="size-option">
+                <input type="radio" name="cake-size" value="${size.label}" data-price="${size.price}" data-detail="${size.detail}" ${i === 0 ? "checked" : ""}>
+                <span class="size-option__content">
+                  <strong>${size.label}</strong>
+                  <small>${size.detail}</small>
+                </span>
+                <b>${money(size.price)}</b>
+              </label>`
+            ).join("")}
+          </div>`,
+      });
+
+      bindLightboxAccordions(flavorsEl);
       flavorsEl.querySelectorAll('input[name="cake-size"]').forEach((input) => {
         input.addEventListener("change", () => {
           lightboxSize = {
@@ -540,11 +556,6 @@
           updateLightboxQty();
           setAccordionState("acc-size", { open: false, done: true });
         });
-      });
-      flavorsEl.querySelector("#lightbox-topper")?.addEventListener("change", (event) => {
-        lightboxTopper = Boolean(event.target.checked);
-        updateLightboxAccordions();
-        updateLightboxQty();
       });
     } else if (isBentoCake(p) && p.flavors?.length) {
       flavorsEl.hidden = false;
@@ -637,12 +648,12 @@
   function updateLightboxQty() {
     if (!lightboxProduct) return;
     const unitPrice = document.getElementById("lightbox-unit-price");
-    const basePrice = lightboxSize?.price || 0;
-    const topperValue = lightboxTopper ? TOPPER_PRICE : 0;
-    const unit = isCustomCake(lightboxProduct) ? basePrice + topperValue : 0;
+    const unit = isReadyCake(lightboxProduct)
+      ? (lightboxSize?.price || 0)
+      : (isCustomCake(lightboxProduct) && lightboxTopper ? TOPPER_PRICE : 0);
     if (unitPrice) {
       unitPrice.textContent = unit > 0
-        ? `${money(unit)}${lightboxTopper ? " com topo personalizado" : ""}`
+        ? `${money(unit)}${lightboxTopper && isCustomCake(lightboxProduct) ? " com topo personalizado" : ""}`
         : "Valor sob consulta";
     }
     document.getElementById("lightbox-qty-value").textContent = String(lightboxQty);
@@ -691,11 +702,17 @@
       openAccordion("acc-flavor");
       return;
     }
+    if (isReadyCake(lightboxProduct) && !lightboxSize) {
+      const err = document.getElementById("order-error");
+      err.textContent = "Escolha o tamanho da Linha Celebre.";
+      err.hidden = false;
+      openAccordion("acc-size");
+      return;
+    }
     const notes = document.getElementById("lightbox-notes").value.trim();
-    const unit =
-      isCustomCake(lightboxProduct) && lightboxSize
-        ? lightboxSize.price + (lightboxTopper ? TOPPER_PRICE : 0)
-        : 0;
+    const unit = isReadyCake(lightboxProduct)
+      ? (lightboxSize?.price || 0)
+      : (lightboxTopper ? TOPPER_PRICE : 0);
     const flavorMeta = [
       lightboxFlavors.length ? lightboxFlavors.join(" / ") : "",
       lightboxBatter && `Massa ${lightboxBatter}`,
