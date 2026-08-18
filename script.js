@@ -89,17 +89,8 @@
     return encodeURI(String(path || ""));
   }
 
-  /** Miniatura leve para cards/galeria (fotos_bolos/_thumbs/...). */
   function thumbSrc(path) {
-    const raw = String(path || "").trim();
-    if (!raw) return "";
-    if (/^https?:\/\//i.test(raw) || raw.startsWith("data:")) return imgSrc(raw);
-    const cleaned = raw.replace(/^\/+/, "");
-    if (!cleaned.startsWith("fotos_bolos/")) return imgSrc(raw);
-    const rest = cleaned.slice("fotos_bolos/".length);
-    if (rest.startsWith("_thumbs/")) return imgSrc(cleaned);
-    const noExt = rest.replace(/\.(jpe?g|png|webp)$/i, "");
-    return imgSrc(`fotos_bolos/_thumbs/${noExt}.jpg`);
+    return imgSrc(path);
   }
 
   function categoryName(id) {

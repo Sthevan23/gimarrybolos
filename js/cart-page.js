@@ -23,12 +23,7 @@
     if (!path) return FALLBACK_IMG;
     const raw = String(path).trim();
     if (/^(data:|blob:|https?:)/i.test(raw)) return raw;
-    const cleaned = raw.replace(/^\//, '');
-    if (!cleaned.startsWith('fotos_bolos/')) return cleaned;
-    const rest = cleaned.slice('fotos_bolos/'.length);
-    if (rest.startsWith('_thumbs/')) return encodeURI(cleaned);
-    const noExt = rest.replace(/\.(jpe?g|png|webp)$/i, '');
-    return encodeURI(`fotos_bolos/_thumbs/${noExt}.jpg`);
+    return encodeURI(raw.replace(/^\//, ''));
   }
 
   function onlyDigits(v) {
