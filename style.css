@@ -890,6 +890,27 @@ p {
   gap: 0.55rem;
   justify-content: center;
   margin-bottom: var(--space-6);
+  position: sticky;
+  top: calc(var(--header-h) - 0.35rem);
+  z-index: 8;
+  padding: 0.65rem 0 0.85rem;
+  background: linear-gradient(to bottom, var(--color-cream) 70%, transparent);
+}
+
+.products-group {
+  scroll-margin-top: calc(var(--header-h) + 3.5rem);
+  margin-bottom: var(--space-8);
+}
+
+.products-group:last-child {
+  margin-bottom: 0;
+}
+
+.products-group__title {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  color: var(--color-brown);
+  margin: 0 0 1rem;
 }
 
 .filter-chip {
@@ -2588,10 +2609,11 @@ body {
     overflow-x: auto;
     gap: 0.45rem;
     margin-inline: -0.75rem;
-    padding-inline: 0.75rem;
+    padding: 0.55rem 0.75rem 0.85rem;
     margin-bottom: 1.25rem;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    background: var(--color-cream);
   }
 
   .products__filter::-webkit-scrollbar {

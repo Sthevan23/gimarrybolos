@@ -39,9 +39,11 @@
   const TOPPER_PRICE = 25;
   const INITIAL_PRODUCTS_LIMIT = 4;
   const GALLERY_LIMIT = 8;
-  let activeCategory = "todos";
+  let activeCategory = "bolos";
   let visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
   let galleryExpanded = false;
+  let productGroupObserver = null;
+  let categorySpyLock = false;
   let lightboxProduct = null;
   let lightboxQty = 1;
   let lightboxFlavors = [];
@@ -248,11 +250,60 @@
   function renderFilters() {
     const el = document.getElementById("category-filter");
     el.innerHTML = catalogCategories()
+      .filter((c) => c.id !== "todos")
       .map(
         (c) =>
           `<button type="button" class="filter-chip ${c.id === activeCategory ? "is-active" : ""}" data-cat="${c.id}">${c.name}</button>`
       )
       .join("");
+  }
+
+  function setActiveCategory(id, { alignChip = true } = {}) {
+    if (!id || id === activeCategory) {
+      if (alignChip) alignFilterChip(id);
+      return;
+    }
+    activeCategory = id;
+    document.querySelectorAll("#category-filter .filter-chip").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.cat === id);
+    });
+    if (alignChip) alignFilterChip(id);
+  }
+
+  function alignFilterChip(id) {
+    const chip = document.querySelector(`#category-filter [data-cat="${id}"]`);
+    chip?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+  }
+
+  function observeProductGroups() {
+    const groups = document.querySelectorAll("[data-cat-group]");
+    if (productGroupObserver) productGroupObserver.disconnect();
+    if (!groups.length || !("IntersectionObserver" in window)) return;
+
+    productGroupObserver = new IntersectionObserver(
+      (entries) => {
+        if (categorySpyLock) return;
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        const id = visible[0]?.target?.dataset.catGroup;
+        if (id) setActiveCategory(id);
+      },
+      { rootMargin: "-28% 0px -58% 0px", threshold: 0.01 }
+    );
+    groups.forEach((group) => productGroupObserver.observe(group));
+  }
+
+  function scrollToCategory(id) {
+    const target =
+      document.getElementById(`grupo-${id}`) || document.getElementById("produtos");
+    if (!target) return;
+    categorySpyLock = true;
+    setActiveCategory(id);
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => {
+      categorySpyLock = false;
+    }, 700);
   }
 
   function accordionSection({ id, title, summary, body, open = false, done = false }) {
@@ -358,32 +409,32 @@
 
   function renderProducts() {
     const all = catalogProducts();
-    const list =
-      activeCategory === "todos"
-        ? all
-        : all.filter((p) => p.category === activeCategory);
-    const hasMoreThanLimit = list.length > INITIAL_PRODUCTS_LIMIT;
-    const visibleList = list.slice(0, visibleProductsCount);
+    const groups = catalogCategories()
+      .filter((c) => c.id !== "todos")
+      .map((c) => ({
+        ...c,
+        products: all.filter((p) => p.category === c.id),
+      }))
+      .filter((g) => g.products.length);
 
-    document.getElementById("products-grid").innerHTML = visibleList.map(cardHTML).join("");
+    document.getElementById("products-grid").innerHTML = groups
+      .map(
+        (g) => `
+        <section class="products-group" id="grupo-${g.id}" data-cat-group="${g.id}">
+          <h3 class="products-group__title">${g.name}</h3>
+          <div class="products__grid">
+            ${g.products.map(cardHTML).join("")}
+          </div>
+        </section>`
+      )
+      .join("");
 
     const actions = document.getElementById("products-actions");
-    const moreBtn = document.getElementById("products-more");
-    const collapseBtn = document.getElementById("products-collapse");
-    const remaining = Math.max(0, list.length - visibleList.length);
-    actions.hidden = !hasMoreThanLimit;
-    if (moreBtn) {
-      moreBtn.hidden = remaining === 0;
-      moreBtn.textContent = remaining > INITIAL_PRODUCTS_LIMIT
-        ? `Ver mais ${INITIAL_PRODUCTS_LIMIT} bolos`
-        : `Ver mais ${remaining} bolos`;
-    }
-    if (collapseBtn) {
-      collapseBtn.hidden = visibleList.length <= INITIAL_PRODUCTS_LIMIT;
-    }
+    if (actions) actions.hidden = true;
 
-    const best = catalogProducts().filter((p) => p.bestSeller).slice(0, 3);
+    const best = all.filter((p) => p.bestSeller).slice(0, 3);
     document.getElementById("bestsellers-grid").innerHTML = best.map(cardHTML).join("");
+    observeProductGroups();
   }
 
   function renderGallery() {
@@ -1089,28 +1140,7 @@
       }
       const chip = e.target.closest("[data-cat]");
       if (chip) {
-        activeCategory = chip.dataset.cat;
-        visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
-        renderFilters();
-        renderProducts();
-        return;
-      }
-      const moreProducts = e.target.closest("#products-more");
-      if (moreProducts) {
-        const all = catalogProducts();
-        const list =
-          activeCategory === "todos"
-            ? all
-            : all.filter((p) => p.category === activeCategory);
-        visibleProductsCount = Math.min(list.length, visibleProductsCount + INITIAL_PRODUCTS_LIMIT);
-        renderProducts();
-        return;
-      }
-      const collapseProducts = e.target.closest("#products-collapse");
-      if (collapseProducts) {
-        visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
-        renderProducts();
-        document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        scrollToCategory(chip.dataset.cat);
         return;
       }
       const toggleGallery = e.target.closest("#gallery-toggle");
