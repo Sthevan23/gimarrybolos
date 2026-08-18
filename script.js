@@ -21,6 +21,16 @@
   ];
   const CAKE_BATTERS = ["Branca", "Chocolate"];
   const CAKE_SIZES = [
+    { label: "1 kg", detail: "12 fatias · 15 cm", price: 95 },
+    { label: "1,5 kg", detail: "17 fatias · 15 cm", price: 140 },
+    { label: "2 kg", detail: "22 fatias · 20 cm", price: 180 },
+    { label: "2,5 kg", detail: "27 fatias · 20 cm", price: 225 },
+    { label: "3 kg", detail: "32 fatias · 30 cm", price: 270 },
+    { label: "3,5 kg", detail: "37 fatias · 30 cm", price: 315 },
+    { label: "4 kg", detail: "42 fatias · 35 cm", price: 360 },
+    { label: "4,5 kg", detail: "47 fatias · 35 cm", price: 405 },
+  ];
+  const CELEBRE_SIZES = [
     { label: "Bolo parabéns", detail: "serve 7 fatias", price: 65 },
     { label: "Bolo comemore", detail: "serve 9 fatias", price: 75 },
     { label: "Bolo celebrar", detail: "serve 13 fatias", price: 95 },
@@ -145,18 +155,20 @@
     document.getElementById("order-pickup").textContent =
       `Retire em ${S.address}. Atendimento combinado pelo WhatsApp.`;
 
-    document.getElementById("hero-bg").style.backgroundImage = `url('${encodeURI(thumbSrc(S.heroImage))}')`;
+    document.getElementById("hero-bg").style.backgroundImage = `url('${thumbSrc(S.heroImage)}')`;
     const sobreImg = document.getElementById("sobre-image");
     if (sobreImg) {
       sobreImg.loading = "lazy";
       sobreImg.decoding = "async";
-      sobreImg.src = encodeURI(thumbSrc(S.aboutImage));
+      sobreImg.src = thumbSrc(S.aboutImage);
+      sobreImg.onerror = () => { sobreImg.onerror = null; sobreImg.src = imgSrc(S.aboutImage); };
     }
     const contactImg = document.getElementById("contact-image");
     if (contactImg) {
       contactImg.loading = "lazy";
       contactImg.decoding = "async";
-      contactImg.src = encodeURI(thumbSrc(S.contactImage));
+      contactImg.src = thumbSrc(S.contactImage);
+      contactImg.onerror = () => { contactImg.onerror = null; contactImg.src = imgSrc(S.contactImage); };
     }
 
     const sobre = document.getElementById("sobre-text");
@@ -220,7 +232,7 @@
         <button type="button" class="product-card__hit" data-open="${p.id}" aria-label="Ver ${p.name}"></button>
         <div class="product-card__img">
           ${badge}
-          <img src="${thumbSrc(p.image)}" alt="${p.name}" loading="lazy" decoding="async" width="480" height="600">
+          <img src="${thumbSrc(p.image)}" alt="${p.name}" loading="lazy" decoding="async" width="480" height="600" data-full="${imgSrc(p.image)}" onerror="this.onerror=null;this.src=this.dataset.full||this.src">
           <span class="product-card__img-veil" aria-hidden="true"></span>
         </div>
         <div class="product-card__body">
@@ -229,7 +241,9 @@
           <p class="product-card__desc">${p.description}</p>
             <div class="product-card__footer">
             <div class="product-card__meta">
-              ${p.size ? `<span class="product-card__size">${p.size}</span>` : ""}
+              ${isCustomCake(p) || isReadyCake(p)
+                ? `<span class="product-card__size">A partir de ${money(isReadyCake(p) ? CELEBRE_SIZES[0].price : CAKE_SIZES[0].price)}</span>`
+                : (p.size ? `<span class="product-card__size">${p.size}</span>` : "")}
             </div>
             <button type="button" class="product-card__add" data-open="${p.id}">
               <span>Adicionar</span>
@@ -274,8 +288,36 @@
     if (done != null) el.classList.toggle("is-done", Boolean(done));
   }
 
-  function openAccordion(id) {
-    setAccordionState(id, { open: true });
+  function sizeOptionsHTML(sizes) {
+    return sizes
+      .map(
+        (size, i) => `
+        <label class="size-option">
+          <input type="radio" name="cake-size" value="${size.label}" data-price="${size.price}" data-detail="${size.detail}" ${i === 0 ? "checked" : ""}>
+          <span class="size-option__content">
+            <strong>${size.label}</strong>
+            <small>${size.detail}</small>
+          </span>
+          <b>${money(size.price)}</b>
+        </label>`
+      )
+      .join("");
+  }
+
+  function bindSizeInputs(flavorsEl) {
+    flavorsEl.querySelectorAll('input[name="cake-size"]').forEach((input) => {
+      input.addEventListener("change", () => {
+        lightboxSize = {
+          label: input.value,
+          detail: input.dataset.detail || "",
+          price: Number(input.dataset.price || 0),
+        };
+        updateLightboxAccordions();
+        updateLightboxQty();
+        setAccordionState("acc-size", { open: false, done: true });
+        if (isCustomCake(lightboxProduct)) openAccordion("acc-extra");
+      });
+    });
   }
 
   function bindLightboxAccordions(root) {
@@ -300,6 +342,12 @@
 
       setAccordionSummary("acc-batter", lightboxBatter || "obrigatório");
       setAccordionState("acc-batter", { done: Boolean(lightboxBatter) });
+
+      const sizeSummary = lightboxSize
+        ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
+        : "obrigatório";
+      setAccordionSummary("acc-size", sizeSummary);
+      setAccordionState("acc-size", { done: Boolean(lightboxSize) });
 
       setAccordionSummary(
         "acc-extra",
@@ -360,7 +408,7 @@
         const label = product.name || `Modelo ${i + 1}`;
         return `<figure class="gallery__item">
           <button type="button" class="gallery__hit" data-gallery-index="${i}" data-gallery-src="${String(src).replace(/"/g, "&quot;")}" aria-label="Encomendar ${label}">
-            <img src="${thumbSrc(src)}" alt="${label}" loading="lazy" decoding="async" width="480" height="600">
+            <img src="${thumbSrc(src)}" alt="${label}" loading="lazy" decoding="async" width="480" height="600" data-full="${imgSrc(src)}" onerror="this.onerror=null;this.src=this.dataset.full||this.src">
             <span class="gallery__hit-label">Encomendar</span>
           </button>
         </figure>`;
@@ -405,11 +453,13 @@
       ? []
       : (p.flavors?.[0] ? [p.flavors[0]] : []);
     lightboxBatter = isCustomCake(p) ? CAKE_BATTERS[0] : "";
-    lightboxSize = isReadyCake(p) ? CAKE_SIZES[0] : null;
+    lightboxSize = isCustomCake(p) ? CAKE_SIZES[0] : (isReadyCake(p) ? CELEBRE_SIZES[0] : null);
     lightboxTopper = false;
 
     document.getElementById("lightbox-img").src = thumbSrc(p.image);
     document.getElementById("lightbox-img").alt = p.name;
+    const lbImg = document.getElementById("lightbox-img");
+    lbImg.onerror = () => { lbImg.onerror = null; lbImg.src = imgSrc(p.image); };
     document.getElementById("lightbox-category").textContent = categoryName(p.category);
     document.getElementById("lightbox-title").textContent = p.name;
     document.getElementById("lightbox-desc").textContent = p.description;
@@ -455,6 +505,16 @@
                 </label>`
               ).join("")}
             </div>`,
+        }),
+        accordionSection({
+          id: "acc-size",
+          title: "Tamanho *",
+          summary: lightboxSize
+            ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
+            : "obrigatório",
+          open: false,
+          done: true,
+          body: `<div class="size-list">${sizeOptionsHTML(CAKE_SIZES)}</div>`,
         }),
         accordionSection({
           id: "acc-extra",
@@ -510,9 +570,10 @@
           lightboxBatter = input.value;
           updateLightboxAccordions();
           setAccordionState("acc-batter", { open: false, done: true });
-          openAccordion("acc-extra");
+          openAccordion("acc-size");
         });
       });
+      bindSizeInputs(flavorsEl);
       flavorsEl.querySelector("#lightbox-topper")?.addEventListener("change", (event) => {
         lightboxTopper = Boolean(event.target.checked);
         updateLightboxAccordions();
@@ -528,35 +589,11 @@
           : "obrigatório",
         open: true,
         done: Boolean(lightboxSize),
-        body: `
-          <div class="size-list">
-            ${CAKE_SIZES.map(
-              (size, i) => `
-              <label class="size-option">
-                <input type="radio" name="cake-size" value="${size.label}" data-price="${size.price}" data-detail="${size.detail}" ${i === 0 ? "checked" : ""}>
-                <span class="size-option__content">
-                  <strong>${size.label}</strong>
-                  <small>${size.detail}</small>
-                </span>
-                <b>${money(size.price)}</b>
-              </label>`
-            ).join("")}
-          </div>`,
+        body: `<div class="size-list">${sizeOptionsHTML(CELEBRE_SIZES)}</div>`,
       });
 
       bindLightboxAccordions(flavorsEl);
-      flavorsEl.querySelectorAll('input[name="cake-size"]').forEach((input) => {
-        input.addEventListener("change", () => {
-          lightboxSize = {
-            label: input.value,
-            detail: input.dataset.detail || "",
-            price: Number(input.dataset.price || 0),
-          };
-          updateLightboxAccordions();
-          updateLightboxQty();
-          setAccordionState("acc-size", { open: false, done: true });
-        });
-      });
+      bindSizeInputs(flavorsEl);
     } else if (isBentoCake(p) && p.flavors?.length) {
       flavorsEl.hidden = false;
       flavorsEl.innerHTML = accordionSection({
@@ -648,9 +685,11 @@
   function updateLightboxQty() {
     if (!lightboxProduct) return;
     const unitPrice = document.getElementById("lightbox-unit-price");
-    const unit = isReadyCake(lightboxProduct)
-      ? (lightboxSize?.price || 0)
-      : (isCustomCake(lightboxProduct) && lightboxTopper ? TOPPER_PRICE : 0);
+    const unit = isCustomCake(lightboxProduct)
+      ? (lightboxSize?.price || 0) + (lightboxTopper ? TOPPER_PRICE : 0)
+      : isReadyCake(lightboxProduct)
+        ? (lightboxSize?.price || 0)
+        : 0;
     if (unitPrice) {
       unitPrice.textContent = unit > 0
         ? `${money(unit)}${lightboxTopper && isCustomCake(lightboxProduct) ? " com topo personalizado" : ""}`
@@ -702,17 +741,19 @@
       openAccordion("acc-flavor");
       return;
     }
-    if (isReadyCake(lightboxProduct) && !lightboxSize) {
+    if ((isCustomCake(lightboxProduct) || isReadyCake(lightboxProduct)) && !lightboxSize) {
       const err = document.getElementById("order-error");
-      err.textContent = "Escolha o tamanho da Linha Celebre.";
+      err.textContent = "Escolha o tamanho do bolo.";
       err.hidden = false;
       openAccordion("acc-size");
       return;
     }
     const notes = document.getElementById("lightbox-notes").value.trim();
-    const unit = isReadyCake(lightboxProduct)
-      ? (lightboxSize?.price || 0)
-      : (lightboxTopper ? TOPPER_PRICE : 0);
+    const unit = isCustomCake(lightboxProduct)
+      ? (lightboxSize?.price || 0) + (lightboxTopper ? TOPPER_PRICE : 0)
+      : isReadyCake(lightboxProduct)
+        ? (lightboxSize?.price || 0)
+        : 0;
     const flavorMeta = [
       lightboxFlavors.length ? lightboxFlavors.join(" / ") : "",
       lightboxBatter && `Massa ${lightboxBatter}`,

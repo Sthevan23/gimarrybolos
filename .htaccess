@@ -5,10 +5,11 @@ Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Fotos originais pesadas: só miniaturas (_thumbs)
-  RewriteCond %{REQUEST_URI} ^/fotos_bolos/ [NC]
+  # Miniaturas se existirem; senão serve a foto original
   RewriteCond %{REQUEST_URI} !^/fotos_bolos/_thumbs/ [NC]
-  RewriteRule .* - [F,L]
+  RewriteCond %{REQUEST_URI} ^/fotos_bolos/(.+)\.(jpe?g|png|webp)$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/fotos_bolos/_thumbs/%1.jpg -f
+  RewriteRule ^fotos_bolos/(.+)\.(jpe?g|png|webp)$ /fotos_bolos/_thumbs/$1.jpg [L]
 
   # Bots / scrapers (cada hit = processo na Hostinger)
   RewriteCond %{HTTP_USER_AGENT} (AhrefsBot|SemrushBot|DotBot|MJ12bot|Bytespider|PetalBot|ClaudeBot|GPTBot|CCBot|DataForSeo|BLEXBot|Zoominfo|Scrapy|Amazonbot|meta-externalagent|FacebookBot|ImagesiftBot|magpie-crawler|masscan|nikto|sqlmap|python-requests|Go-http-client) [NC]

@@ -26,9 +26,9 @@
     const cleaned = raw.replace(/^\//, '');
     if (!cleaned.startsWith('fotos_bolos/')) return cleaned;
     const rest = cleaned.slice('fotos_bolos/'.length);
-    if (rest.startsWith('_thumbs/')) return cleaned;
+    if (rest.startsWith('_thumbs/')) return encodeURI(cleaned);
     const noExt = rest.replace(/\.(jpe?g|png|webp)$/i, '');
-    return `fotos_bolos/_thumbs/${noExt}.jpg`;
+    return encodeURI(`fotos_bolos/_thumbs/${noExt}.jpg`);
   }
 
   function onlyDigits(v) {
