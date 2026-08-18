@@ -37,13 +37,15 @@
   ];
   const MAX_FILLINGS = 2;
   const TOPPER_PRICE = 25;
-  const INITIAL_PRODUCTS_LIMIT = 4;
+  const INITIAL_PRODUCTS_LIMIT = 8;
+  const PRODUCTS_PAGE = 8;
   const GALLERY_LIMIT = 8;
   let activeCategory = "bolos";
   let visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
   let galleryExpanded = false;
   let productGroupObserver = null;
   let categorySpyLock = false;
+  const groupShown = {};
   let lightboxProduct = null;
   let lightboxQty = 1;
   let lightboxFlavors = [];
@@ -271,8 +273,11 @@
   }
 
   function alignFilterChip(id) {
+    const bar = document.getElementById("category-filter");
     const chip = document.querySelector(`#category-filter [data-cat="${id}"]`);
-    chip?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+    if (!bar || !chip) return;
+    const left = chip.offsetLeft - (bar.clientWidth - chip.offsetWidth) / 2;
+    bar.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
   }
 
   function observeProductGroups() {
@@ -299,11 +304,16 @@
       document.getElementById(`grupo-${id}`) || document.getElementById("produtos");
     if (!target) return;
     categorySpyLock = true;
-    setActiveCategory(id);
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActiveCategory(id, { alignChip: true });
+    const top =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      (document.getElementById("header")?.offsetHeight || 72) -
+      56;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
     window.setTimeout(() => {
       categorySpyLock = false;
-    }, 700);
+    }, 900);
   }
 
   function accordionSection({ id, title, summary, body, open = false, done = false }) {
@@ -418,15 +428,24 @@
       .filter((g) => g.products.length);
 
     document.getElementById("products-grid").innerHTML = groups
-      .map(
-        (g) => `
+      .map((g) => {
+        const shown = groupShown[g.id] || PRODUCTS_PAGE;
+        const visible = g.products.slice(0, shown);
+        const remaining = Math.max(0, g.products.length - visible.length);
+        return `
         <section class="products-group" id="grupo-${g.id}" data-cat-group="${g.id}">
           <h3 class="products-group__title">${g.name}</h3>
           <div class="products__grid">
-            ${g.products.map(cardHTML).join("")}
+            ${visible.map(cardHTML).join("")}
           </div>
-        </section>`
-      )
+          ${remaining > 0 ? `
+          <div class="products-group__actions">
+            <button type="button" class="btn btn--ghost products__more" data-group-more="${g.id}">
+              Ver mais ${Math.min(PRODUCTS_PAGE, remaining)} fotos
+            </button>
+          </div>` : ""}
+        </section>`;
+      })
       .join("");
 
     const actions = document.getElementById("products-actions");
@@ -1136,6 +1155,15 @@
         if (!item) return;
         const delta = Number(qtyBtn.dataset.qtyDelta) || 0;
         Cart.updateQty(key, (Number(item.qty) || 0) + delta);
+        return;
+      }
+      const moreGroup = e.target.closest("[data-group-more]");
+      if (moreGroup) {
+        const id = moreGroup.dataset.groupMore;
+        groupShown[id] = (groupShown[id] || PRODUCTS_PAGE) + PRODUCTS_PAGE;
+        const y = window.scrollY;
+        renderProducts();
+        window.scrollTo(0, y);
         return;
       }
       const chip = e.target.closest("[data-cat]");
