@@ -21,14 +21,64 @@
   ];
   const CAKE_BATTERS = ["Branca", "Chocolate"];
   const CAKE_SIZES = [
-    { label: "1 kg", detail: "12 fatias · 15 cm", price: 95 },
-    { label: "1,5 kg", detail: "17 fatias · 15 cm", price: 140 },
-    { label: "2 kg", detail: "22 fatias · 20 cm", price: 180 },
-    { label: "2,5 kg", detail: "27 fatias · 20 cm", price: 225 },
-    { label: "3 kg", detail: "32 fatias · 30 cm", price: 270 },
-    { label: "3,5 kg", detail: "37 fatias · 30 cm", price: 315 },
-    { label: "4 kg", detail: "42 fatias · 35 cm", price: 360 },
-    { label: "4,5 kg", detail: "47 fatias · 35 cm", price: 405 },
+    { label: "1 kg", people: "±12 pessoas", detail: "12 fatias · 15 cm", price: 95 },
+    { label: "1,5 kg", people: "±17 pessoas", detail: "17 fatias · 15 cm", price: 140 },
+    { label: "2 kg", people: "±22 pessoas", detail: "22 fatias · 20 cm", price: 180 },
+    { label: "2,5 kg", people: "±27 pessoas", detail: "27 fatias · 20 cm", price: 225 },
+    { label: "3 kg", people: "±32 pessoas", detail: "32 fatias · 30 cm", price: 270 },
+    { label: "3,5 kg", people: "±37 pessoas", detail: "37 fatias · 30 cm", price: 315 },
+    { label: "4 kg", people: "±42 pessoas", detail: "42 fatias · 35 cm", price: 360 },
+    { label: "4,5 kg", people: "±47 pessoas", detail: "47 fatias · 35 cm", price: 405 },
+  ];
+  const CAKE_THEMES = [
+    { id: "todos", label: "Todos os temas" },
+    {
+      id: "personagens",
+      label: "Personagens",
+      keys: [
+        "mickey", "hello kitty", "stitch", "rei leao", "lego", "homem-aranha",
+        "aranha", "bob esponja", "dr. stone", "dr stone", "wandinha", "sonic",
+        "catnap", "patrulha", "pokemon", "ursinhos", "ursinho", "lilo",
+        "unicornio", "coelhinha", "mario", "flork", "pooh", "k-pop", "kpop",
+        "nemo", "dinossauro", "tigre", "carrinho", "tubarao", "smile kitty",
+        "playstation", "velozes", "guerreiras", "hello kitty"
+      ],
+    },
+    {
+      id: "infantil",
+      label: "Infantil",
+      keys: [
+        "infantil", "mesversario", "bebe", "baby", "dinossauro", "mickey",
+        "hello kitty", "stitch", "lego", "homem-aranha", "bob esponja",
+        "sonic", "patrulha", "pokemon", "ursinho", "mario", "pooh", "nemo",
+        "unicornio", "coelhinha", "tubarao", "casinha", "tigre", "carrinho"
+      ],
+    },
+    {
+      id: "floral",
+      label: "Floral",
+      keys: ["floral", "flores", "girassol", "rosas", "margarida"],
+    },
+    {
+      id: "aniversario",
+      label: "Aniversário",
+      keys: ["happy birthday", "aniversario", "birthday", " anos", "15 anos", "80 anos"],
+    },
+    {
+      id: "mesversario",
+      label: "Mesversário",
+      keys: ["mesversario"],
+    },
+    {
+      id: "times",
+      label: "Times e esporte",
+      keys: ["selecao", "atletico", "futebol", "cruzeiro", "al-nassr", "academia"],
+    },
+    {
+      id: "lacos",
+      label: "Laços e delicado",
+      keys: ["laco", "coquette", "vintage", "lambeth", "perola", "coracao"],
+    },
   ];
   const CELEBRE_SIZES = [
     { label: "Bolo parabéns", detail: "serve 7 fatias", price: 65 },
@@ -41,6 +91,8 @@
   const PRODUCTS_PAGE = 8;
   const GALLERY_LIMIT = 8;
   let activeCategory = "bolos";
+  let activeTheme = "todos";
+  let searchQuery = "";
   let visibleProductsCount = INITIAL_PRODUCTS_LIMIT;
   let galleryExpanded = false;
   let productGroupObserver = null;
@@ -52,6 +104,9 @@
   let lightboxBatter = "";
   let lightboxSize = null;
   let lightboxTopper = false;
+  let lightboxTopperName = "";
+  let lightboxTopperNumber = "";
+  let lightboxTopperPhrase = "";
   let heroWordIndex = 0;
 
   function catalogCategories() {
@@ -113,6 +168,70 @@
     return product?.category === "bento";
   }
 
+  function normalizeText(value) {
+    return String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function productSearchBlob(product) {
+    return normalizeText(
+      [product?.name, product?.description, categoryName(product?.category)].join(" ")
+    );
+  }
+
+  function productMatchesTheme(product, themeId) {
+    if (!themeId || themeId === "todos") return true;
+    const theme = CAKE_THEMES.find((item) => item.id === themeId);
+    if (!theme?.keys?.length) return true;
+    const blob = productSearchBlob(product);
+    return theme.keys.some((key) => blob.includes(normalizeText(key)));
+  }
+
+  function productMatchesQuery(product, query) {
+    const q = normalizeText(query).trim();
+    if (!q) return true;
+    return productSearchBlob(product).includes(q);
+  }
+
+  function catalogIsFiltered() {
+    return activeTheme !== "todos" || Boolean(searchQuery.trim());
+  }
+
+  function sizeSummary(size) {
+    if (!size) return "";
+    return size.people
+      ? `${size.people} · ${money(size.price)}`
+      : `${size.label} · ${money(size.price)}`;
+  }
+
+  function sizeCartLabel(size) {
+    if (!size) return "";
+    return [size.people, size.label, size.detail].filter(Boolean).join(" · ");
+  }
+
+  function readTopperFields() {
+    lightboxTopperName = document.getElementById("topper-name")?.value.trim() || "";
+    lightboxTopperNumber = document.getElementById("topper-number")?.value.trim() || "";
+    lightboxTopperPhrase = document.getElementById("topper-phrase")?.value.trim() || "";
+  }
+
+  function topperSummary() {
+    if (!lightboxTopper) return "opcional · + " + money(TOPPER_PRICE);
+    const bits = [lightboxTopperName, lightboxTopperNumber, lightboxTopperPhrase].filter(Boolean);
+    return bits.length ? `${bits.join(", ")} · + ${money(TOPPER_PRICE)}` : `sim · + ${money(TOPPER_PRICE)}`;
+  }
+
+  function topperNote() {
+    if (!lightboxTopper) return "";
+    const bits = ["Topo personalizado"];
+    if (lightboxTopperName) bits.push(`Nome: ${lightboxTopperName}`);
+    if (lightboxTopperNumber) bits.push(`Número: ${lightboxTopperNumber}`);
+    if (lightboxTopperPhrase) bits.push(`Frase: ${lightboxTopperPhrase}`);
+    return bits.join(" · ");
+  }
+
   const MAX_BENTO_FLAVORS = 2;
 
   function toast(msg, withCartLink = false) {
@@ -138,7 +257,7 @@
     document.getElementById("footer-brand-sub").textContent = S.brandSub;
     document.getElementById("footer-copy-name").textContent = S.brandName;
     document.getElementById("footer-tagline").textContent =
-      "Feito com amor · confeitaria artesanal";
+      "Bolo personalizado com o tema da sua festa";
     document.getElementById("hero-title-line-1").textContent = S.heroTitle1 || "Bolos artesanais feitos com carinho";
     document.getElementById("hero-title-line-2").textContent = S.heroTitle2 || "para deixar seu momento mais";
     document.getElementById("hero-lead").textContent = S.tagline;
@@ -148,7 +267,7 @@
     document.getElementById("footer-address").textContent = S.address.split("·")[0].trim();
     document.getElementById("contact-address-text").textContent = S.address;
     document.getElementById("order-pickup").textContent =
-      `Retire em ${S.address}. Atendimento combinado pelo WhatsApp.`;
+      `A mensagem já vai montada. Confirmamos a data e a retirada em ${S.address}.`;
 
     document.getElementById("hero-bg").style.backgroundImage = `url('${thumbSrc(S.heroImage)}')`;
     const sobreImg = document.getElementById("sobre-image");
@@ -241,7 +360,7 @@
                 : (p.size ? `<span class="product-card__size">${p.size}</span>` : "")}
             </div>
             <button type="button" class="product-card__add" data-open="${p.id}">
-              <span>Adicionar</span>
+              <span>${isCustomCake(p) ? "Quero esse modelo" : "Adicionar"}</span>
               <span class="ico ico--plus" aria-hidden="true"></span>
             </button>
           </div>
@@ -250,6 +369,13 @@
   }
 
   function renderFilters() {
+    const themesEl = document.getElementById("theme-filter");
+    if (themesEl) {
+      themesEl.innerHTML = CAKE_THEMES.map(
+        (theme) =>
+          `<button type="button" class="filter-chip ${theme.id === activeTheme ? "is-active" : ""}" data-theme="${theme.id}">${theme.label}</button>`
+      ).join("");
+    }
     const el = document.getElementById("category-filter");
     el.innerHTML = catalogCategories()
       .filter((c) => c.id !== "todos")
@@ -340,15 +466,23 @@
     if (done != null) el.classList.toggle("is-done", Boolean(done));
   }
 
+  function openAccordion(id) {
+    document.querySelectorAll("#lightbox-flavors .order-acc.is-open").forEach((el) => {
+      if (el.id !== id) el.classList.remove("is-open");
+    });
+    setAccordionState(id, { open: true });
+    document.getElementById(id)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
   function sizeOptionsHTML(sizes) {
     return sizes
       .map(
         (size, i) => `
         <label class="size-option">
-          <input type="radio" name="cake-size" value="${size.label}" data-price="${size.price}" data-detail="${size.detail}" ${i === 0 ? "checked" : ""}>
+          <input type="radio" name="cake-size" value="${size.label}" data-price="${size.price}" data-detail="${size.detail || ""}" data-people="${size.people || ""}" ${i === 0 ? "checked" : ""}>
           <span class="size-option__content">
-            <strong>${size.label}</strong>
-            <small>${size.detail}</small>
+            <strong>${size.people || size.label}</strong>
+            <small>${size.people ? `${size.label} · ${size.detail}` : size.detail}</small>
           </span>
           <b>${money(size.price)}</b>
         </label>`
@@ -362,12 +496,13 @@
         lightboxSize = {
           label: input.value,
           detail: input.dataset.detail || "",
+          people: input.dataset.people || "",
           price: Number(input.dataset.price || 0),
         };
         updateLightboxAccordions();
         updateLightboxQty();
         setAccordionState("acc-size", { open: false, done: true });
-        if (isCustomCake(lightboxProduct)) openAccordion("acc-extra");
+        if (isCustomCake(lightboxProduct)) openAccordion("acc-fillings");
       });
     });
   }
@@ -395,30 +530,26 @@
       setAccordionSummary("acc-batter", lightboxBatter || "obrigatório");
       setAccordionState("acc-batter", { done: Boolean(lightboxBatter) });
 
-      const sizeSummary = lightboxSize
-        ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
-        : "obrigatório";
-      setAccordionSummary("acc-size", sizeSummary);
+      const sizeSummaryText = lightboxSize ? sizeSummary(lightboxSize) : "obrigatório";
+      setAccordionSummary("acc-size", sizeSummaryText);
       setAccordionState("acc-size", { done: Boolean(lightboxSize) });
 
-      setAccordionSummary(
-        "acc-extra",
-        lightboxTopper ? `+ ${money(TOPPER_PRICE)}` : "opcional"
-      );
+      setAccordionSummary("acc-extra", topperSummary());
       setAccordionState("acc-extra", { done: lightboxTopper });
     }
 
     if (isReadyCake(lightboxProduct)) {
-      const sizeSummary = lightboxSize
-        ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
-        : "obrigatório";
-      setAccordionSummary("acc-size", sizeSummary);
+      const sizeSummaryText = lightboxSize ? sizeSummary(lightboxSize) : "obrigatório";
+      setAccordionSummary("acc-size", sizeSummaryText);
       setAccordionState("acc-size", { done: Boolean(lightboxSize) });
     }
   }
 
   function renderProducts() {
-    const all = catalogProducts();
+    const all = catalogProducts().filter(
+      (p) => productMatchesTheme(p, activeTheme) && productMatchesQuery(p, searchQuery)
+    );
+    const filtered = catalogIsFiltered();
     const groups = catalogCategories()
       .filter((c) => c.id !== "todos")
       .map((c) => ({
@@ -427,9 +558,34 @@
       }))
       .filter((g) => g.products.length);
 
-    document.getElementById("products-grid").innerHTML = groups
+    const countEl = document.getElementById("products-count");
+    if (countEl) {
+      if (filtered) {
+        countEl.hidden = false;
+        countEl.textContent = all.length
+          ? `${all.length} ${all.length === 1 ? "modelo encontrado" : "modelos encontrados"}`
+          : "Nenhum modelo com essa busca. Tente o personagem, a cor ou o tema da festa.";
+      } else {
+        countEl.hidden = true;
+        countEl.textContent = "";
+      }
+    }
+
+    const grid = document.getElementById("products-grid");
+    if (!groups.length) {
+      grid.innerHTML = `
+        <div class="products__empty">
+          <p>Não achamos esse modelo.</p>
+          <p>Busque pelo tema da festa — Mickey, floral, dinossauro — ou volte para todos os temas.</p>
+          <button type="button" class="btn btn--ghost" id="products-clear-filters">Ver todos os modelos</button>
+        </div>`;
+      observeProductGroups();
+      return;
+    }
+
+    grid.innerHTML = groups
       .map((g) => {
-        const shown = groupShown[g.id] || PRODUCTS_PAGE;
+        const shown = filtered ? g.products.length : (groupShown[g.id] || PRODUCTS_PAGE);
         const visible = g.products.slice(0, shown);
         const remaining = Math.max(0, g.products.length - visible.length);
         return `
@@ -451,8 +607,12 @@
     const actions = document.getElementById("products-actions");
     if (actions) actions.hidden = true;
 
-    const best = all.filter((p) => p.bestSeller).slice(0, 3);
-    document.getElementById("bestsellers-grid").innerHTML = best.map(cardHTML).join("");
+    const bestGrid = document.getElementById("bestsellers-grid");
+    if (bestGrid && !bestGrid.dataset.ready) {
+      const best = catalogProducts().filter((p) => p.bestSeller).slice(0, 3);
+      bestGrid.innerHTML = best.map(cardHTML).join("");
+      bestGrid.dataset.ready = "1";
+    }
     observeProductGroups();
   }
 
@@ -516,27 +676,43 @@
     lightboxBatter = isCustomCake(p) ? CAKE_BATTERS[0] : "";
     lightboxSize = isCustomCake(p) ? CAKE_SIZES[0] : (isReadyCake(p) ? CELEBRE_SIZES[0] : null);
     lightboxTopper = false;
+    lightboxTopperName = "";
+    lightboxTopperNumber = "";
+    lightboxTopperPhrase = "";
 
     document.getElementById("lightbox-img").src = thumbSrc(p.image);
     document.getElementById("lightbox-img").alt = p.name;
     const lbImg = document.getElementById("lightbox-img");
     lbImg.onerror = () => { lbImg.onerror = null; lbImg.src = imgSrc(p.image); };
-    document.getElementById("lightbox-category").textContent = categoryName(p.category);
+    document.getElementById("lightbox-category").textContent = isCustomCake(p)
+      ? "Modelo escolhido"
+      : categoryName(p.category);
     document.getElementById("lightbox-title").textContent = p.name;
     document.getElementById("lightbox-desc").textContent = p.description;
     document.getElementById("lightbox-notes").value = "";
     document.getElementById("order-error").hidden = true;
+    const qtyRow = document.querySelector("#order-lightbox .order-qty-row");
+    if (qtyRow) qtyRow.hidden = isCustomCake(p);
     updateLightboxQty();
 
     const flavorsEl = document.getElementById("lightbox-flavors");
     if (isCustomCake(p)) {
       flavorsEl.hidden = false;
       flavorsEl.innerHTML = [
+        `<p class="order-guide">Esse é o modelo. Agora diga para quantas pessoas, o sabor e o que vai no topo.</p>`,
+        accordionSection({
+          id: "acc-size",
+          title: "Para quantas pessoas? *",
+          summary: lightboxSize ? sizeSummary(lightboxSize) : "obrigatório",
+          open: true,
+          done: Boolean(lightboxSize),
+          body: `<div class="size-list">${sizeOptionsHTML(CAKE_SIZES)}</div>`,
+        }),
         accordionSection({
           id: "acc-fillings",
           title: `Escolha até ${MAX_FILLINGS} recheios *`,
           summary: "obrigatório",
-          open: true,
+          open: false,
           body: `
             <div class="flavor-list__grid flavor-list__grid--wide flavor-list__grid--scroll">
               ${CAKE_FILLINGS.map(
@@ -568,29 +744,30 @@
             </div>`,
         }),
         accordionSection({
-          id: "acc-size",
-          title: "Tamanho *",
-          summary: lightboxSize
-            ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
-            : "obrigatório",
-          open: false,
-          done: true,
-          body: `<div class="size-list">${sizeOptionsHTML(CAKE_SIZES)}</div>`,
-        }),
-        accordionSection({
           id: "acc-extra",
           title: "Topo personalizado",
-          summary: "opcional",
+          summary: topperSummary(),
           open: false,
           body: `
             <label class="extra-option">
               <input type="checkbox" id="lightbox-topper">
               <span class="extra-option__content">
-                <strong>Topo personalizado</strong>
-                <small>Adicionar topo decorativo ao bolo</small>
+                <strong>Topo com nome e idade</strong>
+                <small>É o diferencial da casa — a maioria dos bolos sai com topo</small>
               </span>
               <b>+ ${money(TOPPER_PRICE)}</b>
-            </label>`,
+            </label>
+            <div class="topper-fields" id="topper-fields" hidden>
+              <label class="order-field">Nome no topo
+                <input type="text" id="topper-name" maxlength="40" placeholder="Ex: Ana" autocomplete="off">
+              </label>
+              <label class="order-field">Idade ou número
+                <input type="text" id="topper-number" maxlength="12" placeholder="Ex: 15" inputmode="numeric" autocomplete="off">
+              </label>
+              <label class="order-field">Frase (opcional)
+                <input type="text" id="topper-phrase" maxlength="60" placeholder="Ex: Tardezinha da Ana" autocomplete="off">
+              </label>
+            </div>`,
         }),
       ].join("");
 
@@ -622,7 +799,7 @@
           updateLightboxAccordions();
           if (lightboxFlavors.length >= MAX_FILLINGS) {
             setAccordionState("acc-fillings", { open: false, done: true });
-            openAccordion("acc-batter");
+            openAccordion(lightboxBatter ? "acc-extra" : "acc-batter");
           }
         });
       });
@@ -631,23 +808,34 @@
           lightboxBatter = input.value;
           updateLightboxAccordions();
           setAccordionState("acc-batter", { open: false, done: true });
-          openAccordion("acc-size");
+          openAccordion("acc-extra");
         });
       });
       bindSizeInputs(flavorsEl);
-      flavorsEl.querySelector("#lightbox-topper")?.addEventListener("change", (event) => {
-        lightboxTopper = Boolean(event.target.checked);
+      function syncTopperFields() {
+        const fields = document.getElementById("topper-fields");
+        if (fields) fields.hidden = !lightboxTopper;
+        readTopperFields();
         updateLightboxAccordions();
         updateLightboxQty();
+      }
+      flavorsEl.querySelector("#lightbox-topper")?.addEventListener("change", (event) => {
+        lightboxTopper = Boolean(event.target.checked);
+        if (lightboxTopper) setAccordionState("acc-extra", { open: true });
+        syncTopperFields();
+      });
+      ["topper-name", "topper-number", "topper-phrase"].forEach((id) => {
+        flavorsEl.querySelector(`#${id}`)?.addEventListener("input", () => {
+          readTopperFields();
+          updateLightboxAccordions();
+        });
       });
     } else if (isReadyCake(p)) {
       flavorsEl.hidden = false;
       flavorsEl.innerHTML = accordionSection({
         id: "acc-size",
-        title: "Linha Celebre — tamanho *",
-        summary: lightboxSize
-          ? `${lightboxSize.label} · ${money(lightboxSize.price)}`
-          : "obrigatório",
+        title: "Para quantas pessoas? *",
+        summary: lightboxSize ? sizeSummary(lightboxSize) : "obrigatório",
         open: true,
         done: Boolean(lightboxSize),
         body: `<div class="size-list">${sizeOptionsHTML(CELEBRE_SIZES)}</div>`,
@@ -766,6 +954,8 @@
     lightbox.classList.remove("is-open");
     lightbox.hidden = true;
     lightboxProduct = null;
+    const qtyRow = document.querySelector("#order-lightbox .order-qty-row");
+    if (qtyRow) qtyRow.hidden = false;
     if (document.getElementById("cart-drawer").hidden) {
       document.body.style.overflow = "";
     }
@@ -804,10 +994,21 @@
     }
     if ((isCustomCake(lightboxProduct) || isReadyCake(lightboxProduct)) && !lightboxSize) {
       const err = document.getElementById("order-error");
-      err.textContent = "Escolha o tamanho do bolo.";
+      err.textContent = "Escolha para quantas pessoas é o bolo.";
       err.hidden = false;
       openAccordion("acc-size");
       return;
+    }
+    if (isCustomCake(lightboxProduct) && lightboxTopper) {
+      readTopperFields();
+      if (!lightboxTopperName && !lightboxTopperNumber && !lightboxTopperPhrase) {
+        const err = document.getElementById("order-error");
+        err.textContent = "Escreva o nome, a idade ou a frase do topo.";
+        err.hidden = false;
+        openAccordion("acc-extra");
+        document.getElementById("topper-name")?.focus();
+        return;
+      }
     }
     const notes = document.getElementById("lightbox-notes").value.trim();
     const unit = isCustomCake(lightboxProduct)
@@ -821,17 +1022,15 @@
     ]
       .filter(Boolean)
       .join(" · ");
-    const noteMeta = [notes, lightboxTopper ? "Topo personalizado" : ""]
-      .filter(Boolean)
-      .join(" · ");
+    const noteMeta = [topperNote(), notes].filter(Boolean).join(" · ");
     Cart.addItem({
       productId: lightboxProduct.id,
       name: lightboxProduct.name,
       price: unit,
-      qty: lightboxQty,
+      qty: isCustomCake(lightboxProduct) ? 1 : lightboxQty,
       flavor: flavorMeta,
       size: lightboxSize
-        ? `${lightboxSize.label} · ${lightboxSize.detail}`
+        ? sizeCartLabel(lightboxSize)
         : (lightboxProduct.size || ""),
       image: lightboxProduct.image,
       notes: noteMeta,
@@ -839,7 +1038,7 @@
     closeLightbox();
     renderCart();
     pulseCart();
-    toast("Adicionado ao carrinho", true);
+    toast(isCustomCake(lightboxProduct) ? "Bolo adicionado ao carrinho" : "Adicionado ao carrinho", true);
   }
 
   /* ---------- cart (padrão Aurora) ---------- */
@@ -885,7 +1084,7 @@
       body.innerHTML = `
         <div class="cart-drawer__empty-box">
           <p class="cart-drawer__empty">Seu carrinho está vazio</p>
-          <p class="cart-drawer__empty-note">Escolha algo no cardápio.</p>
+          <p class="cart-drawer__empty-note">Escolha um modelo e personalize o seu bolo.</p>
         </div>`;
       if (totalRow) totalRow.hidden = true;
       if (finalRow) finalRow.hidden = true;
@@ -1116,8 +1315,7 @@
     document
       .getElementById("lightbox-backdrop")
       .addEventListener("click", closeLightbox);
-    document
-      .getElementById("lightbox-add-cart")
+    document.getElementById("lightbox-add-cart")
       .addEventListener("click", addFromLightbox);
     document.getElementById("lightbox-qty-minus").addEventListener("click", () => {
       lightboxQty = Math.max(1, lightboxQty - 1);
@@ -1127,6 +1325,17 @@
       lightboxQty += 1;
       updateLightboxQty();
     });
+
+    const search = document.getElementById("product-search");
+    if (search) {
+      search.addEventListener("input", () => {
+        searchQuery = search.value;
+        renderProducts();
+      });
+      search.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") e.preventDefault();
+      });
+    }
 
     document.addEventListener("click", (e) => {
       const galleryHit = e.target.closest("[data-gallery-src]");
@@ -1164,6 +1373,23 @@
         const y = window.scrollY;
         renderProducts();
         window.scrollTo(0, y);
+        return;
+      }
+      const clearFilters = e.target.closest("#products-clear-filters");
+      if (clearFilters) {
+        activeTheme = "todos";
+        searchQuery = "";
+        const searchInput = document.getElementById("product-search");
+        if (searchInput) searchInput.value = "";
+        renderFilters();
+        renderProducts();
+        return;
+      }
+      const themeChip = e.target.closest("[data-theme]");
+      if (themeChip) {
+        activeTheme = themeChip.dataset.theme;
+        renderFilters();
+        renderProducts();
         return;
       }
       const chip = e.target.closest("[data-cat]");

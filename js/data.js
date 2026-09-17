@@ -1,16 +1,16 @@
 const SITE_DATA = {
   "settings": {
     "brandName": "Gimarry Bolos",
-    "brandSub": "Bolos e Doces",
-    "heroTitle1": "Bolos artesanais feitos com carinho",
+    "brandSub": "Bolo personalizado",
+    "heroTitle1": "Bolo personalizado com o tema da sua festa",
     "heroTitle2": "para deixar seu momento mais",
-    "tagline": "Escolha no cardápio, monte seu pedido e finalize pelo WhatsApp.",
+    "tagline": "Escolha o modelo pela foto. Depois você diz o tamanho, o recheio e o que vai no topo.",
     "heroWords": [
-      "doce",
       "especial",
+      "único",
       "inesquecível"
     ],
-    "categoriesLine": "Bolos · Bento · Pronta entrega · Destaques",
+    "categoriesLine": "Personalizado · Topo · Recheio · Tamanho",
     "city": "Divinópolis, MG",
     "whatsapp": "5537988554691",
     "instagram": "https://instagram.com/confeitosgimarry",
@@ -1724,11 +1724,11 @@ const SITE_DATA = {
     "fotos_bolos/bolos_amostra/WhatsApp Image 2026-07-08 at 13.08.16 (3).jpeg"
   ],
   "marquee": [
-    "Cardápio online",
-    "Retirada no local",
+    "Bolo personalizado",
+    "Topo com nome",
+    "Escolha o modelo",
+    "Recheio e tamanho",
     "Gimarry Bolos",
-    "Encomendas sob medida",
-    "Feito com amor",
-    "Valores sob consulta"
+    "Retirada no local"
   ]
 };

@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Gimarry Bolos — confeitaria artesanal. Cardápio online, carrinho e pedidos pelo site.">
+  <meta name="description" content="Gimarry Bolos — bolos personalizados com topo, recheio e o tamanho da sua festa. Escolha o modelo e encomende pelo site.">
   <meta name="author" content="Gimarry Bolos">
-  <meta property="og:title" content="Gimarry Bolos — Bolos e Doces">
-  <meta property="og:description" content="Bolos, copos, cookies e doces feitos com amor. Peça pelo site.">
-  <title>Gimarry Bolos — Bolos e Doces</title>
+  <meta property="og:title" content="Gimarry Bolos — Bolo personalizado">
+  <meta property="og:description" content="Escolha o modelo pela foto, personalize topo, recheio e tamanho. Pedidos pelo site em Divinópolis, MG.">
+  <title>Gimarry Bolos — Bolo personalizado com topo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,600;1,500&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=43">
+  <link rel="stylesheet" href="style.css?v=44">
 </head>
 <body>
   <header class="header" id="header">
@@ -22,7 +22,7 @@
       <nav class="header__nav" id="nav-menu" aria-label="Principal">
         <a href="#sobre">Sobre</a>
         <a href="#mais-vendidos">Mais vendidos</a>
-        <a href="#produtos">Cardápio</a>
+        <a href="#produtos">Modelos</a>
         <a href="#galeria">Galeria</a>
         <a href="#encomendas">Encomendas</a>
         <a href="#contato">Contato</a>
@@ -59,7 +59,7 @@
           </span>
         </h1>
 
-        <p class="hero__lead" id="hero-lead">Escolha no cardápio, monte seu pedido e finalize pelo WhatsApp.</p>
+        <p class="hero__lead" id="hero-lead">Escolha o modelo pela foto e personalize tamanho, recheio e o topo da festa.</p>
 
         <p class="hero__place">
           <span id="hero-categories">Bolos · Copos · Cookies · Potes</span>
@@ -67,8 +67,8 @@
         </p>
 
         <div class="hero__actions">
-          <a class="btn btn--primary" href="#produtos">Ver cardápio</a>
-          <a class="btn btn--secondary" href="#produtos">Montar pedido</a>
+          <a class="btn btn--primary" href="#produtos">Escolher modelo</a>
+          <a class="btn btn--secondary" href="#encomendas">Como personalizar</a>
         </div>
       </div>
     </section>
@@ -97,11 +97,11 @@
         <div class="bestsellers__intro">
           <p class="section__eyebrow">Favoritos da casa</p>
           <h2 class="section__title">Mais <em>vendidos</em></h2>
-          <p class="section__lead">Os queridinhos de quem já pediu — destaque automático no cardápio.</p>
+          <p class="section__lead">Modelos que mais pedem — toque na foto e personalize o seu.</p>
         </div>
         <div class="products__grid bestsellers__grid" id="bestsellers-grid"></div>
         <div class="bestsellers__cta">
-          <a class="btn btn--ghost" href="#produtos">Ver cardápio completo</a>
+          <a class="btn btn--ghost" href="#produtos">Ver todos os modelos</a>
         </div>
       </div>
     </section>
@@ -109,11 +109,37 @@
     <section class="section products" id="produtos">
       <div class="container">
         <div class="products__intro">
-          <p class="section__eyebrow">Cardápio</p>
-          <h2 class="section__title">Nossos <em>produtos</em></h2>
-          <p class="section__lead">Toque em Adicionar, escolha o sabor e finalize no carrinho. O pedido segue para o WhatsApp.</p>
+          <p class="section__eyebrow">Modelos</p>
+          <h2 class="section__title">Escolha o <em>bolo</em></h2>
+          <p class="section__lead">Escolha o modelo pela foto. Depois você personaliza o tamanho, o recheio e o topo com o nome da festa.</p>
+          <ol class="choose-steps">
+            <li>
+              <span>1</span>
+              <div><strong>Modelo</strong><small>A foto que combinou com a festa</small></div>
+            </li>
+            <li>
+              <span>2</span>
+              <div><strong>Tamanho</strong><small>Para quantas pessoas</small></div>
+            </li>
+            <li>
+              <span>3</span>
+              <div><strong>Sabor</strong><small>Massa e até 2 recheios</small></div>
+            </li>
+            <li>
+              <span>4</span>
+              <div><strong>Topo</strong><small>Nome, idade e frase</small></div>
+            </li>
+          </ol>
         </div>
-        <div class="products__filter" id="category-filter"></div>
+        <div class="products__tools">
+          <label class="products__search">
+            <span class="sr-only">Buscar modelo</span>
+            <input type="search" id="product-search" placeholder="Buscar o tema: Mickey, floral, dinossauro…" autocomplete="off">
+          </label>
+          <div class="products__filter products__filter--themes" id="theme-filter"></div>
+          <div class="products__filter" id="category-filter"></div>
+          <p class="products__count" id="products-count" hidden></p>
+        </div>
         <div class="products__catalog" id="products-grid"></div>
         <div class="products__actions" id="products-actions" hidden>
           <button type="button" class="btn btn--ghost products__more" id="products-more">Ver mais 9 bolos</button>
@@ -127,7 +153,7 @@
         <div class="gallery__intro">
           <p class="section__eyebrow">Inspiração</p>
           <h2 class="section__title">Nossa <em>galeria</em></h2>
-          <p class="section__lead">Toque em uma foto para escolher sabores e encomendar.</p>
+          <p class="section__lead">Viu um modelo que combinou? Toque na foto para personalizar tamanho, recheio e topo.</p>
         </div>
         <div class="gallery__grid" id="gallery-grid"></div>
         <div class="products__actions" id="gallery-actions" hidden>
@@ -140,32 +166,32 @@
       <div class="container order__panel">
         <div class="order__copy">
           <p class="section__eyebrow">Encomendas</p>
-          <h2 class="section__title">Pedidos simples, atendimento próximo</h2>
-          <p class="section__lead">O cliente monta o pedido no site. Você recebe a mensagem pronta no WhatsApp — sem confusão de sabores ou quantidades.</p>
+          <h2 class="section__title">Bolo personalizado, pedido sem confusão</h2>
+          <p class="section__lead">Você escolhe o modelo e diz o que vai no topo. A mensagem chega pronta no WhatsApp — com tamanho, recheio e o nome da festa.</p>
           <div class="order__cta">
-            <a class="btn btn--secondary" href="#produtos">Montar pedido no cardápio</a>
+            <a class="btn btn--secondary" href="#produtos">Escolher meu modelo</a>
           </div>
         </div>
         <ol class="order__steps">
           <li>
             <span>01</span>
             <div>
-              <h3>Escolha no cardápio</h3>
-              <p>Toque no produto, escolha o sabor e adicione ao carrinho.</p>
+              <h3>Escolha o modelo</h3>
+              <p>Toque na foto do bolo. Esse é o visual da sua festa.</p>
             </div>
           </li>
           <li>
             <span>02</span>
             <div>
-              <h3>Finalize o pedido</h3>
-              <p>Preencha nome e WhatsApp. A mensagem já sai montada.</p>
+              <h3>Personalize o seu</h3>
+              <p>Quantas pessoas, recheio, massa e o que escrever no topo.</p>
             </div>
           </li>
           <li>
             <span>03</span>
             <div>
-              <h3>Retirada no local</h3>
-              <p id="order-pickup">Retire no endereço da casa com atendimento combinado pelo WhatsApp.</p>
+              <h3>Confirme no WhatsApp</h3>
+              <p id="order-pickup">A mensagem já vai montada. A gente confirma a data e a retirada.</p>
             </div>
           </li>
         </ol>
@@ -177,12 +203,12 @@
         <div class="contact__copy">
           <p class="section__eyebrow">Contato</p>
           <h2 class="section__title">Seu pedido começa <em>aqui</em></h2>
-          <p class="section__lead">Conte o que você quer — a gente monta a mensagem e segue no WhatsApp.</p>
+          <p class="section__lead">Se ainda estiver em dúvida no modelo, manda uma mensagem. A gente te ajuda a escolher.</p>
 
           <form class="contact__form" id="contact-form">
             <label>Nome<input name="name" required minlength="2" placeholder="Seu nome" autocomplete="name"></label>
             <label>Telefone / WhatsApp<input name="phone" id="contact-phone" type="tel" required minlength="14" maxlength="15" placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="tel"></label>
-            <label>Mensagem<textarea name="message" required minlength="5" rows="4" placeholder="Sabor, quantidade e data…"></textarea></label>
+            <label>Mensagem<textarea name="message" required minlength="5" rows="4" placeholder="Tema, quantas pessoas, nome no topo e data da festa…"></textarea></label>
             <div class="contact__actions">
               <button class="btn btn--primary" type="submit">Enviar mensagem</button>
             </div>
@@ -221,7 +247,7 @@
 
       <nav class="footer__nav" aria-label="Rodapé">
         <p class="footer__heading">Navegação</p>
-        <a href="#produtos">Cardápio</a>
+        <a href="#produtos">Modelos</a>
         <a href="#mais-vendidos">Mais vendidos</a>
         <a href="#contato">Contato</a>
       </nav>
@@ -307,7 +333,7 @@
           <div id="lightbox-flavors" hidden></div>
           <label class="order-field order-field--notes">
             Observações
-            <textarea id="lightbox-notes" rows="2" maxlength="240" placeholder="Ex: Pouco doce, sem cobertura…"></textarea>
+            <textarea id="lightbox-notes" rows="2" maxlength="240" placeholder="Cor, data da festa ou outro detalhe…"></textarea>
           </label>
           <div class="order-qty-row">
             <span class="order-qty-row__label">Quantidade</span>
@@ -334,8 +360,8 @@
 
   <div class="cart-feedback" id="cart-feedback" hidden aria-live="polite"></div>
 
-  <script src="js/data.js?v=36" defer></script>
-  <script src="js/cart-shared.js?v=28" defer></script>
-  <script src="script.js?v=52" defer></script>
+  <script src="js/data.js?v=37" defer></script>
+  <script src="js/cart-shared.js?v=29" defer></script>
+  <script src="script.js?v=53" defer></script>
 </body>
 </html>

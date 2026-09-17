@@ -214,11 +214,12 @@ window.AuroraCart = (() => {
 
     const lines = list.map((item) => {
       const qty = Number(item.qty) || 1;
-      const flavor = item.flavor ? ` (${item.flavor})` : '';
-      const notes = item.notes ? `\n   Obs: ${item.notes}` : '';
+      const size = item.size ? `\n   Tamanho: ${item.size}` : '';
+      const flavor = item.flavor ? `\n   Sabor: ${item.flavor}` : '';
+      const notes = item.notes ? `\n   ${item.notes}` : '';
       const lineTotal = (Number(item.price) || 0) * qty;
       const priceBlock = lineTotal > 0 ? `\n   ${formatMoney(lineTotal)}` : '';
-      return `${qty}x ${item.name}${flavor}${priceBlock}${notes}`;
+      return `${qty}x ${item.name}${size}${flavor}${priceBlock}${notes}`;
     }).join('\n\n');
 
     return (
