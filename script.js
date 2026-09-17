@@ -1326,16 +1326,47 @@
       updateLightboxQty();
     });
 
-    const search = document.getElementById("product-search");
-    if (search) {
-      search.addEventListener("input", () => {
-        searchQuery = search.value;
-        renderProducts();
-      });
-      search.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") e.preventDefault();
+    const searchInputs = [...document.querySelectorAll("[data-product-search]")];
+    let searchJumpT = 0;
+
+    function syncSearchInputs(value, fromEl) {
+      searchInputs.forEach((el) => {
+        if (el !== fromEl) el.value = value;
       });
     }
+
+    function jumpToCatalog() {
+      const target = document.getElementById("produtos");
+      if (!target) return;
+      const top = target.getBoundingClientRect().top;
+      if (top > 90 && top < window.innerHeight * 0.4) return;
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function applyProductSearch(value, fromEl, jump) {
+      searchQuery = value;
+      syncSearchInputs(value, fromEl);
+      renderProducts();
+      if (!jump) return;
+      clearTimeout(searchJumpT);
+      searchJumpT = window.setTimeout(jumpToCatalog, 80);
+    }
+
+    searchInputs.forEach((input) => {
+      input.addEventListener("input", () => {
+        applyProductSearch(input.value, input, input.value.trim().length >= 2);
+      });
+      input.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        applyProductSearch(input.value, input, true);
+      });
+    });
+    document.getElementById("hero-search-form")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("hero-search");
+      applyProductSearch(input?.value || "", input, true);
+    });
 
     document.addEventListener("click", (e) => {
       const galleryHit = e.target.closest("[data-gallery-src]");
@@ -1379,8 +1410,9 @@
       if (clearFilters) {
         activeTheme = "todos";
         searchQuery = "";
-        const searchInput = document.getElementById("product-search");
-        if (searchInput) searchInput.value = "";
+        document.querySelectorAll("[data-product-search]").forEach((el) => {
+          el.value = "";
+        });
         renderFilters();
         renderProducts();
         return;

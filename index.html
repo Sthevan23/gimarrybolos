@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,600;1,500&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=44">
+  <link rel="stylesheet" href="style.css?v=45">
 </head>
 <body>
   <header class="header" id="header">
@@ -27,6 +27,10 @@
         <a href="#encomendas">Encomendas</a>
         <a href="#contato">Contato</a>
       </nav>
+      <label class="header__search">
+        <span class="sr-only">Buscar modelo</span>
+        <input type="search" id="header-search" data-product-search placeholder="Buscar modelo…" autocomplete="off">
+      </label>
       <a class="header__cart header__cart--link" href="cart.html" id="cart-open" aria-label="Abrir carrinho">
         <span class="ico ico--bag" aria-hidden="true"></span>
         <span class="header__cart-label">Carrinho</span>
@@ -61,14 +65,20 @@
 
         <p class="hero__lead" id="hero-lead">Escolha o modelo pela foto e personalize tamanho, recheio e o topo da festa.</p>
 
+        <form class="hero__search" id="hero-search-form" role="search">
+          <label class="sr-only" for="hero-search">Buscar o tema do bolo</label>
+          <input type="search" id="hero-search" data-product-search placeholder="Qual o tema? Mickey, floral, dinossauro…" autocomplete="off">
+          <button type="submit" class="btn btn--primary">Buscar</button>
+        </form>
+
         <p class="hero__place">
           <span id="hero-categories">Bolos · Copos · Cookies · Potes</span>
           <span id="hero-place">Divinópolis, MG</span>
         </p>
 
         <div class="hero__actions">
-          <a class="btn btn--primary" href="#produtos">Escolher modelo</a>
-          <a class="btn btn--secondary" href="#encomendas">Como personalizar</a>
+          <a class="btn btn--secondary" href="#produtos">Ver todos os modelos</a>
+          <a class="btn btn--ghost" href="#encomendas">Como personalizar</a>
         </div>
       </div>
     </section>
@@ -132,10 +142,6 @@
           </ol>
         </div>
         <div class="products__tools">
-          <label class="products__search">
-            <span class="sr-only">Buscar modelo</span>
-            <input type="search" id="product-search" placeholder="Buscar o tema: Mickey, floral, dinossauro…" autocomplete="off">
-          </label>
           <div class="products__filter products__filter--themes" id="theme-filter"></div>
           <div class="products__filter" id="category-filter"></div>
           <p class="products__count" id="products-count" hidden></p>
@@ -362,6 +368,6 @@
 
   <script src="js/data.js?v=37" defer></script>
   <script src="js/cart-shared.js?v=29" defer></script>
-  <script src="script.js?v=53" defer></script>
+  <script src="script.js?v=54" defer></script>
 </body>
 </html>
