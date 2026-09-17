@@ -1362,11 +1362,6 @@
         applyProductSearch(input.value, input, true);
       });
     });
-    document.getElementById("hero-search-form")?.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const input = document.getElementById("hero-search");
-      applyProductSearch(input?.value || "", input, true);
-    });
 
     document.addEventListener("click", (e) => {
       const galleryHit = e.target.closest("[data-gallery-src]");
