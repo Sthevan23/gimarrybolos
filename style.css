@@ -31,8 +31,13 @@
   --shadow-lift: 0 24px 48px rgba(232, 90, 118, 0.14);
 
   --container: min(1120px, calc(100% - 2.5rem));
+  --header-row: 4.5rem;
   --header-h: 4.5rem;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body:has(.header__filters) {
+  --header-h: 7.45rem;
 }
 
 /* Ícones leves (sem Font Awesome) */
@@ -80,7 +85,12 @@
 @media (max-width: 720px) {
   :root {
     --container: min(1120px, calc(100% - 1.5rem));
+    --header-row: 4rem;
     --header-h: 4rem;
+  }
+
+  body:has(.header__filters) {
+    --header-h: 7.1rem;
   }
 }
 
@@ -285,7 +295,7 @@ p {
 }
 
 .header__inner {
-  height: 100%;
+  height: var(--header-row);
   display: grid;
   grid-template-columns: 1fr minmax(12rem, 20rem) auto;
   align-items: center;
@@ -321,6 +331,25 @@ p {
   outline: 2px solid color-mix(in srgb, var(--color-pink) 55%, transparent);
   outline-offset: 2px;
   border-color: var(--color-pink);
+}
+
+.header__filters {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 0 1.25rem 0.7rem;
+  scrollbar-width: none;
+}
+
+.header__filters::-webkit-scrollbar {
+  display: none;
+}
+
+.header__filters .filter-chip {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.92);
 }
 
 .header__nav a {
@@ -432,6 +461,11 @@ p {
     display: flex;
     justify-content: space-between;
     grid-template-columns: none;
+  }
+
+  .header__filters {
+    justify-content: flex-start;
+    padding-inline: 0.75rem;
   }
 
   .header__toggle {

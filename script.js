@@ -30,55 +30,21 @@
     { label: "4 kg", people: "±42 pessoas", detail: "42 fatias · 35 cm", price: 360 },
     { label: "4,5 kg", people: "±47 pessoas", detail: "47 fatias · 35 cm", price: 405 },
   ];
+  const INFANTIL_KEYS = [
+    "mickey", "minnie", "hello kitty", "smile kitty", "stitch", "lilo",
+    "rei leao", "lego", "homem-aranha", "aranha", "bob esponja", "sonic",
+    "catnap", "patrulha", "pokemon", "ursinho", "unicornio", "coelhinha",
+    "mario", "pooh", "nemo", "dinossauro", "tigre", "carrinho", "tubarao",
+    "mesversario", "baby", "bebe", "casinha", "wandinha", "dr. stone",
+    "dr stone", "playstation", "velozes", "k-pop", "kpop", "flork",
+    "guerreiras", "desenho", "personagem"
+  ];
   const CAKE_THEMES = [
-    { id: "todos", label: "Todos os temas" },
-    {
-      id: "personagens",
-      label: "Personagens",
-      keys: [
-        "mickey", "hello kitty", "stitch", "rei leao", "lego", "homem-aranha",
-        "aranha", "bob esponja", "dr. stone", "dr stone", "wandinha", "sonic",
-        "catnap", "patrulha", "pokemon", "ursinhos", "ursinho", "lilo",
-        "unicornio", "coelhinha", "mario", "flork", "pooh", "k-pop", "kpop",
-        "nemo", "dinossauro", "tigre", "carrinho", "tubarao", "smile kitty",
-        "playstation", "velozes", "guerreiras", "hello kitty"
-      ],
-    },
-    {
-      id: "infantil",
-      label: "Infantil",
-      keys: [
-        "infantil", "mesversario", "bebe", "baby", "dinossauro", "mickey",
-        "hello kitty", "stitch", "lego", "homem-aranha", "bob esponja",
-        "sonic", "patrulha", "pokemon", "ursinho", "mario", "pooh", "nemo",
-        "unicornio", "coelhinha", "tubarao", "casinha", "tigre", "carrinho"
-      ],
-    },
-    {
-      id: "floral",
-      label: "Floral",
-      keys: ["floral", "flores", "girassol", "rosas", "margarida"],
-    },
-    {
-      id: "aniversario",
-      label: "Aniversário",
-      keys: ["happy birthday", "aniversario", "birthday", " anos", "15 anos", "80 anos"],
-    },
-    {
-      id: "mesversario",
-      label: "Mesversário",
-      keys: ["mesversario"],
-    },
-    {
-      id: "times",
-      label: "Times e esporte",
-      keys: ["selecao", "atletico", "futebol", "cruzeiro", "al-nassr", "academia"],
-    },
-    {
-      id: "lacos",
-      label: "Laços e delicado",
-      keys: ["laco", "coquette", "vintage", "lambeth", "perola", "coracao"],
-    },
+    { id: "todos", label: "Todos" },
+    { id: "infantil", label: "Infantil", keys: INFANTIL_KEYS },
+    { id: "adulto", label: "Adulto", invert: "infantil" },
+    { id: "mesversario", label: "Mesversário", keys: ["mesversario", "bebe", "baby"] },
+    { id: "times", label: "Times", keys: ["selecao", "atletico", "futebol", "cruzeiro", "al-nassr"] },
   ];
   const CELEBRE_SIZES = [
     { label: "Bolo parabéns", detail: "serve 7 fatias", price: 65 },
@@ -181,12 +147,24 @@
     );
   }
 
+  function productMatchesKeys(product, keys) {
+    if (!keys?.length) return false;
+    const blob = productSearchBlob(product);
+    return keys.some((key) => blob.includes(normalizeText(key)));
+  }
+
   function productMatchesTheme(product, themeId) {
     if (!themeId || themeId === "todos") return true;
     const theme = CAKE_THEMES.find((item) => item.id === themeId);
-    if (!theme?.keys?.length) return true;
-    const blob = productSearchBlob(product);
-    return theme.keys.some((key) => blob.includes(normalizeText(key)));
+    if (!theme) return true;
+    if ((theme.id === "infantil" || theme.id === "adulto") && !isCustomCake(product)) {
+      return false;
+    }
+    if (theme.invert) {
+      const source = CAKE_THEMES.find((item) => item.id === theme.invert);
+      return !productMatchesKeys(product, source?.keys);
+    }
+    return productMatchesKeys(product, theme.keys);
   }
 
   function productMatchesQuery(product, query) {
@@ -1417,6 +1395,7 @@
         activeTheme = themeChip.dataset.theme;
         renderFilters();
         renderProducts();
+        document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
       const chip = e.target.closest("[data-cat]");
