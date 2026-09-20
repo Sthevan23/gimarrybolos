@@ -108,6 +108,7 @@ const pageTitles = {
   categorias: 'Categorias',
   clientes: 'Clientes',
   financeiro: 'Financeiro',
+  analises: 'Análises',
   cupons: 'Cupons',
   configuracoes: 'Configurações'
 };
@@ -137,6 +138,7 @@ function navigateTo(page) {
   document.body.classList.remove('sidebar-open');
 
   if (page === 'financeiro') initFinanceiro();
+  if (page === 'analises') initAnalises();
   if (page === 'cupons') renderCoupons();
   if (page === 'dashboard') renderDashboard();
   if (page === 'pedidos') {
@@ -2556,6 +2558,382 @@ function renderRevenueChart() {
       }
     }
   });
+}
+
+/* --- Análises (tráfego do site) --- */
+let analyticsPeriod = '7d';
+let analyticsPeriodBound = false;
+let analyticsHourChart = null;
+let analyticsDailyChart = null;
+let analyticsWeekdayChart = null;
+let analyticsLoading = false;
+
+async function fetchAnalyticsData(period) {
+  if (typeof Storage === 'object' && Storage.getAnalytics) {
+    return Storage.getAnalytics(period);
+  }
+  throw new Error('Análises indisponíveis');
+}
+
+function formatAnalyticsLocation(row) {
+  const parts = [row.city, row.region, row.country].filter(Boolean);
+  return parts.join(' · ') || 'Desconhecido';
+}
+
+function formatAnalyticsPage(page) {
+  const map = {
+    'index.html': 'Início',
+    'cart.html': 'Carrinho',
+    '': 'Início',
+  };
+  return map[page] || page || '—';
+}
+
+function formatAnalyticsDelta(value) {
+  if (value === null || value === undefined) return { text: '—', cls: 'is-neutral' };
+  if (value > 0) return { text: `▲ +${value}%`, cls: 'is-up' };
+  if (value < 0) return { text: `▼ ${value}%`, cls: 'is-down' };
+  return { text: '→ 0%', cls: 'is-neutral' };
+}
+
+function convBadgeClass(rate) {
+  if (rate >= 25) return 'is-good';
+  if (rate >= 10) return 'is-mid';
+  return 'is-low';
+}
+
+function renderAnalyticsHeader(data) {
+  const label = document.getElementById('analytics-period-label');
+  const updated = document.getElementById('analytics-updated');
+  const compare = document.getElementById('analytics-compare-label');
+  if (label) label.textContent = data.periodLabel || 'Período selecionado';
+  if (compare) compare.textContent = data.compareLabel || 'Comparativo com período anterior';
+  if (updated && data.generatedAt) {
+    const dt = new Date(data.generatedAt);
+    const when = Number.isNaN(dt.getTime())
+      ? data.generatedAt
+      : dt.toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    updated.textContent = `Atualizado: ${when}`;
+  }
+}
+
+function renderAnalyticsInsights(insights) {
+  const list = document.getElementById('analytics-insights-list');
+  if (!list) return;
+  const items = Array.isArray(insights) ? insights : [];
+  list.innerHTML = items.map((text) => `<li>${escapeHtml(text)}</li>`).join('');
+}
+
+function renderAnalyticsKpis(summary, delta) {
+  const s = summary || {};
+  const d = delta || s.delta || {};
+
+  document.getElementById('an-visitors').textContent = String(s.uniqueVisitors ?? 0);
+  document.getElementById('an-pageviews').textContent = String(s.pageViews ?? 0);
+  document.getElementById('an-orders').textContent = String(s.ordersCreated ?? 0);
+  document.getElementById('an-conversion').textContent = `${s.conversionRate ?? 0}%`;
+  document.getElementById('an-cart').textContent = String(s.addToCart ?? 0);
+  document.getElementById('an-abandon').textContent = `${s.abandonCheckout ?? 0}%`;
+
+  const avgEl = document.getElementById('an-avg-pages');
+  if (avgEl) avgEl.textContent = `${s.avgPagesPerVisitor ?? 0} pág./visitante`;
+
+  const checkoutMeta = document.getElementById('an-checkout-meta');
+  if (checkoutMeta) {
+    checkoutMeta.textContent = `${s.beginCheckout ?? 0} checkouts iniciados`;
+  }
+
+  [
+    ['an-visitors-delta', d.uniqueVisitors],
+    ['an-orders-delta', d.ordersCreated],
+    ['an-cart-delta', d.addToCart],
+  ].forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const fmt = formatAnalyticsDelta(val);
+    el.textContent = fmt.text;
+    el.className = `stat-card__delta ${fmt.cls}`;
+  });
+}
+
+function renderAnalyticsFunnel(funnel, summary, peak) {
+  const pipeline = document.getElementById('analytics-funnel-pipeline');
+  const metrics = document.getElementById('analytics-funnel-metrics');
+  const peakBadge = document.getElementById('analytics-peak-badge');
+  const steps = Array.isArray(funnel) ? funnel : [];
+  const maxVal = Math.max(1, ...steps.map((st) => st.value || 0));
+
+  if (pipeline) {
+    pipeline.innerHTML = steps.map((step) => {
+      const pct = Math.max(8, Math.round(((step.value || 0) / maxVal) * 100));
+      return `
+        <div class="stat-card analytics-funnel-step-card">
+          <span class="stat-card__label">${escapeHtml(step.label)}</span>
+          <strong class="stat-card__value">${step.value ?? 0}</strong>
+          <div class="analytics-funnel-step__bar-wrap">
+            <div class="analytics-funnel-step__bar" style="width:${pct}%"></div>
+          </div>
+          <span class="analytics-funnel-step__rate">${step.rate ?? 0}% do total</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (metrics && summary) {
+    metrics.innerHTML = `
+      <div class="analytics-funnel-metric">Produto → Carrinho<strong>${summary.cartRate ?? 0}%</strong></div>
+      <div class="analytics-funnel-metric">Carrinho → Checkout<strong>${summary.checkoutRate ?? 0}%</strong></div>
+      <div class="analytics-funnel-metric">Checkout → Pedido<strong>${summary.orderRate ?? 0}%</strong></div>
+    `;
+  }
+
+  if (peakBadge) {
+    if (peak?.peakCount > 0) {
+      peakBadge.hidden = false;
+      peakBadge.textContent = `Pico: ${peak.peakHourLabel} (${peak.peakCount} views)`;
+    } else {
+      peakBadge.hidden = true;
+    }
+  }
+}
+
+function renderAnalyticsHourChart(byHour) {
+  const ctx = document.getElementById('analytics-hour-chart');
+  if (!ctx || typeof Chart === 'undefined') return;
+  if (analyticsHourChart) analyticsHourChart.destroy();
+  const labels = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}h`);
+  analyticsHourChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Page views',
+        data: Array.isArray(byHour) ? byHour : [],
+        backgroundColor: 'rgba(233, 30, 99, 0.55)',
+        borderColor: '#E91E63',
+        borderWidth: 1,
+        borderRadius: 6,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#f0f0f0' } },
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } },
+      },
+    },
+  });
+}
+
+function renderAnalyticsDailyChart(dailyVisits) {
+  const ctx = document.getElementById('analytics-daily-chart');
+  if (!ctx || typeof Chart === 'undefined') return;
+  if (analyticsDailyChart) analyticsDailyChart.destroy();
+  const rows = Array.isArray(dailyVisits) ? dailyVisits : [];
+  analyticsDailyChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: rows.map((r) => {
+        const d = r.date ? new Date(`${r.date}T12:00:00`) : null;
+        return d && !Number.isNaN(d.getTime())
+          ? d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+          : r.date || '';
+      }),
+      datasets: [{
+        label: 'Visitas',
+        data: rows.map((r) => r.total),
+        borderColor: '#9C27B0',
+        backgroundColor: 'rgba(156, 39, 176, 0.12)',
+        fill: true,
+        tension: 0.35,
+        pointRadius: 3,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#f0f0f0' } },
+        x: { grid: { display: false } },
+      },
+    },
+  });
+}
+
+function renderAnalyticsWeekdayChart(byWeekday) {
+  const ctx = document.getElementById('analytics-weekday-chart');
+  if (!ctx || typeof Chart === 'undefined') return;
+  if (analyticsWeekdayChart) analyticsWeekdayChart.destroy();
+  const rows = Array.isArray(byWeekday) ? byWeekday : [];
+  analyticsWeekdayChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: rows.map((r) => r.label),
+      datasets: [{
+        label: 'Visitas',
+        data: rows.map((r) => r.total),
+        backgroundColor: 'rgba(33, 150, 243, 0.5)',
+        borderColor: '#2196F3',
+        borderWidth: 1,
+        borderRadius: 6,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#f0f0f0' } },
+        x: { grid: { display: false } },
+      },
+    },
+  });
+}
+
+function renderAnalyticsSourceList(containerId, emptyId, rows, labelKey) {
+  const container = document.getElementById(containerId);
+  const empty = document.getElementById(emptyId);
+  const items = Array.isArray(rows) ? rows : [];
+  if (!container) return;
+
+  if (empty) empty.hidden = items.length > 0;
+  if (items.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  const max = Math.max(1, ...items.map((r) => r.sessions || 0));
+  container.innerHTML = items.map((row) => {
+    const count = row.sessions || 0;
+    const pct = Math.round((count / max) * 100);
+    const label = labelKey === 'location'
+      ? formatAnalyticsLocation(row)
+      : (row.source || '—');
+    return `
+      <div class="analytics-source-row">
+        <span class="analytics-source-row__label">${escapeHtml(label)}</span>
+        <span class="analytics-source-row__count">${count}</span>
+        <div class="analytics-source-row__bar-wrap">
+          <div class="analytics-source-row__bar" style="width:${pct}%"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAnalyticsTables(data) {
+  const productsBody = document.querySelector('#analytics-products-table tbody');
+  const productsEmpty = document.getElementById('analytics-products-empty');
+  const products = data.topProducts || [];
+  const maxViews = Math.max(1, ...products.map((p) => p.views || 0));
+
+  if (productsBody) {
+    productsBody.innerHTML = products.map((row, i) => {
+      const conv = row.conversionRate ?? 0;
+      const barPct = Math.round(((row.views || 0) / maxViews) * 100);
+      const rankCls = i < 3 ? 'is-top' : '';
+      return `
+        <tr>
+          <td data-label="#"><span class="analytics-rank ${rankCls}">${i + 1}</span></td>
+          <td data-label="Produto"><strong>${escapeHtml(row.productName || row.productId || '—')}</strong></td>
+          <td data-label="Visualizações">${row.views ?? 0}</td>
+          <td data-label="Carrinho">${row.adds ?? 0}</td>
+          <td data-label="Conversão">
+            <span class="analytics-conv-badge ${convBadgeClass(conv)}">${conv}%</span>
+          </td>
+          <td data-label="Interesse" class="analytics-bar-cell">
+            <div class="analytics-interest-bar">
+              <div class="analytics-interest-bar__fill" style="width:${barPct}%"></div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+  if (productsEmpty) productsEmpty.hidden = products.length > 0;
+
+  const pagesBody = document.querySelector('#analytics-pages-table tbody');
+  const pagesEmpty = document.getElementById('analytics-pages-empty');
+  const pages = data.topPages || [];
+  const totalPageViews = pages.reduce((sum, p) => sum + (p.total || 0), 0) || 1;
+
+  if (pagesBody) {
+    pagesBody.innerHTML = pages.map((row) => {
+      const share = Math.round(((row.total || 0) / totalPageViews) * 100);
+      return `
+        <tr>
+          <td data-label="Página">${escapeHtml(formatAnalyticsPage(row.page))}</td>
+          <td data-label="Views">${row.total ?? 0}</td>
+          <td data-label="Share">${share}%</td>
+        </tr>
+      `;
+    }).join('');
+  }
+  if (pagesEmpty) pagesEmpty.hidden = pages.length > 0;
+
+  renderAnalyticsSourceList('analytics-referrers-list', 'analytics-referrers-empty', data.referrers);
+  renderAnalyticsSourceList('analytics-locations-list', 'analytics-locations-empty', data.locations, 'location');
+}
+
+function setAnalyticsLoading(isLoading) {
+  const loading = document.getElementById('analytics-loading');
+  const content = document.getElementById('analytics-content');
+  if (loading) loading.hidden = !isLoading;
+  if (content) content.hidden = isLoading;
+}
+
+async function loadAnalytics() {
+  if (analyticsLoading) return;
+  analyticsLoading = true;
+  setAnalyticsLoading(true);
+  const refreshBtn = document.getElementById('analytics-refresh');
+  if (refreshBtn) {
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando…';
+  }
+  try {
+    const data = await fetchAnalyticsData(analyticsPeriod);
+    renderAnalyticsHeader(data);
+    renderAnalyticsInsights(data.insights);
+    renderAnalyticsKpis(data.summary, data.summary?.delta);
+    renderAnalyticsFunnel(data.funnel, data.summary, {
+      peakHourLabel: data.peakHourLabel,
+      peakCount: data.peakCount,
+    });
+    renderAnalyticsHourChart(data.byHour);
+    renderAnalyticsDailyChart(data.dailyVisits);
+    renderAnalyticsWeekdayChart(data.byWeekday);
+    renderAnalyticsTables(data);
+    setAnalyticsLoading(false);
+  } catch (err) {
+    setAnalyticsLoading(false);
+    showToast(err.message || 'Erro ao carregar análises', 'error');
+  } finally {
+    analyticsLoading = false;
+    if (refreshBtn) {
+      refreshBtn.disabled = false;
+      refreshBtn.innerHTML = '<i class="fas fa-sync"></i> Atualizar';
+    }
+  }
+}
+
+function initAnalises() {
+  if (!analyticsPeriodBound) {
+    analyticsPeriodBound = true;
+    document.querySelectorAll('#analytics-period-tabs .filter-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('#analytics-period-tabs .filter-tab').forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        analyticsPeriod = tab.dataset.period || '7d';
+        loadAnalytics();
+      });
+    });
+    document.getElementById('analytics-refresh')?.addEventListener('click', () => loadAnalytics());
+  }
+  loadAnalytics();
 }
 
 function escapeHtml(str) {

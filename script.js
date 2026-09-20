@@ -681,6 +681,7 @@
         ? idOrProduct
         : catalogProducts().find((x) => x.id === idOrProduct);
     if (!p) return;
+    if (window.GimarryAnalytics) GimarryAnalytics.productView(p);
     lightboxProduct = p;
     lightboxQty = 1;
     lightboxFlavors = isCustomCake(p) || isBentoCake(p)
@@ -1048,6 +1049,14 @@
       image: lightboxProduct.image,
       notes: noteMeta,
     });
+    if (window.GimarryAnalytics) {
+      GimarryAnalytics.addToCart({
+        productId: lightboxProduct.id,
+        name: lightboxProduct.name,
+        qty: isCustomCake(lightboxProduct) ? 1 : lightboxQty,
+        categoryId: lightboxProduct.category,
+      });
+    }
     closeLightbox();
     renderCart();
     pulseCart();
@@ -1207,6 +1216,7 @@
       return;
     }
     err.hidden = true;
+    if (window.GimarryAnalytics) GimarryAnalytics.beginCheckout({ items: Cart.count() });
 
     Cart.saveCustomer({ nome, sobrenome, phone });
     Cart.setFulfillment(fulfillment);
@@ -1217,6 +1227,7 @@
         notes: "Retirada no local",
       });
     }
+    if (window.GimarryAnalytics) GimarryAnalytics.orderCreated({ items: Cart.count() });
     const msg = Cart.buildWhatsAppMessage({
       fullName: `${nome} ${sobrenome}`,
       phone,

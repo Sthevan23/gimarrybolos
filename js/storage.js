@@ -944,6 +944,241 @@ const Storage = (() => {
     });
   }
 
+  function loadAnalyticsEvents() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem('gimarry_analytics_events_v1') || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function brazilParts(ts) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      hourCycle: 'h23',
+      weekday: 'short',
+    }).formatToParts(new Date(ts));
+    const get = (type) => parts.find((p) => p.type === type)?.value;
+    const weekdayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+    return {
+      date: `${get('year')}-${get('month')}-${get('day')}`,
+      hour: Number(get('hour')),
+      weekday: weekdayMap[get('weekday')] ?? 0,
+    };
+  }
+
+  function periodRange(period) {
+    const now = Date.now();
+    const startToday = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    startToday.setHours(0, 0, 0, 0);
+    const todayStart = startToday.getTime();
+    if (period === 'today') {
+      return { from: todayStart, to: now, label: 'Hoje', prevFrom: todayStart - 86400000, prevTo: todayStart };
+    }
+    const days = period === '30d' ? 30 : 7;
+    const from = now - days * 86400000;
+    return {
+      from,
+      to: now,
+      label: days === 30 ? 'Últimos 30 dias' : 'Últimos 7 dias',
+      prevFrom: from - days * 86400000,
+      prevTo: from,
+    };
+  }
+
+  function inRange(ts, from, to) {
+    const n = Number(ts) || 0;
+    return n >= from && n < to;
+  }
+
+  function uniqueSessions(list) {
+    return new Set(list.map((e) => e.sessionId).filter(Boolean)).size;
+  }
+
+  function countType(list, type) {
+    return list.filter((e) => e.eventType === type).length;
+  }
+
+  function rate(part, total) {
+    if (!total) return 0;
+    return Math.round((part / total) * 100);
+  }
+
+  function deltaPct(now, prev) {
+    if (prev === 0) return now === 0 ? 0 : 100;
+    return Math.round(((now - prev) / prev) * 100);
+  }
+
+  function referrerLabel(ref) {
+    const value = String(ref || '').trim();
+    if (!value) return 'Direto';
+    try {
+      const host = new URL(value).hostname.replace(/^www\./, '');
+      if (/instagram|l\.instagram/.test(host)) return 'Instagram';
+      if (/facebook|fb\./.test(host)) return 'Facebook';
+      if (/whatsapp|wa\.me/.test(host)) return 'WhatsApp';
+      if (/google|gstatic/.test(host)) return 'Google';
+      return host || 'Outros';
+    } catch {
+      return 'Outros';
+    }
+  }
+
+  function getAnalytics(period) {
+    const range = periodRange(period);
+    const all = loadAnalyticsEvents();
+    const current = all.filter((e) => inRange(e.ts, range.from, range.to));
+    const previous = all.filter((e) => inRange(e.ts, range.prevFrom, range.prevTo));
+
+    const visitors = uniqueSessions(current);
+    const prevVisitors = uniqueSessions(previous);
+    const pageViews = countType(current, 'page_view');
+    const productViews = countType(current, 'product_view');
+    const addToCart = countType(current, 'add_to_cart');
+    const beginCheckout = countType(current, 'begin_checkout');
+    const ordersCreated = countType(current, 'order_created');
+    const prevOrders = countType(previous, 'order_created');
+    const prevCart = countType(previous, 'add_to_cart');
+
+    const visitorsWithPage = uniqueSessions(current.filter((e) => e.eventType === 'page_view'));
+    const sessionsProduct = uniqueSessions(current.filter((e) => e.eventType === 'product_view'));
+    const sessionsCart = uniqueSessions(current.filter((e) => e.eventType === 'add_to_cart'));
+    const sessionsCheckout = uniqueSessions(current.filter((e) => e.eventType === 'begin_checkout'));
+    const sessionsOrder = uniqueSessions(current.filter((e) => e.eventType === 'order_created'));
+
+    const summary = {
+      uniqueVisitors: visitors,
+      pageViews,
+      avgPagesPerVisitor: visitors ? Math.round((pageViews / visitors) * 10) / 10 : 0,
+      ordersCreated,
+      conversionRate: rate(ordersCreated, visitors || 1),
+      addToCart,
+      beginCheckout,
+      abandonCheckout: rate(Math.max(0, beginCheckout - ordersCreated), beginCheckout || 1),
+      cartRate: rate(sessionsCart, sessionsProduct || visitors || 1),
+      checkoutRate: rate(sessionsCheckout, sessionsCart || 1),
+      orderRate: rate(sessionsOrder, sessionsCheckout || 1),
+      delta: {
+        uniqueVisitors: deltaPct(visitors, prevVisitors),
+        ordersCreated: deltaPct(ordersCreated, prevOrders),
+        addToCart: deltaPct(addToCart, prevCart),
+      },
+    };
+
+    const funnelBase = Math.max(visitors, 1);
+    const funnel = [
+      { label: 'Visitas', value: visitors, rate: 100 },
+      { label: 'Produto', value: sessionsProduct, rate: rate(sessionsProduct, funnelBase) },
+      { label: 'Carrinho', value: sessionsCart, rate: rate(sessionsCart, funnelBase) },
+      { label: 'Checkout', value: sessionsCheckout, rate: rate(sessionsCheckout, funnelBase) },
+      { label: 'Pedido', value: sessionsOrder, rate: rate(sessionsOrder, funnelBase) },
+    ];
+
+    const byHour = Array.from({ length: 24 }, () => 0);
+    const byWeekdayTotals = Array.from({ length: 7 }, () => 0);
+    const dailyMap = {};
+    current.forEach((event) => {
+      const parts = brazilParts(event.ts);
+      if (event.eventType === 'page_view') byHour[parts.hour] += 1;
+      byWeekdayTotals[parts.weekday] += event.eventType === 'page_view' ? 1 : 0;
+      if (event.eventType === 'page_view') {
+        dailyMap[parts.date] = (dailyMap[parts.date] || 0) + 1;
+      }
+    });
+    const weekdayLabels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const byWeekday = weekdayLabels.map((label, i) => ({ label, total: byWeekdayTotals[i] }));
+    const dailyVisits = Object.keys(dailyMap).sort().map((date) => ({ date, total: dailyMap[date] }));
+
+    let peakHour = 0;
+    let peakCount = 0;
+    byHour.forEach((count, hour) => {
+      if (count > peakCount) {
+        peakCount = count;
+        peakHour = hour;
+      }
+    });
+
+    const productMap = {};
+    current.forEach((event) => {
+      if (!event.productName && !event.productId) return;
+      const key = String(event.productId || event.productName);
+      if (!productMap[key]) productMap[key] = { productId: event.productId, productName: event.productName || event.productId, views: 0, adds: 0 };
+      if (event.eventType === 'product_view') productMap[key].views += 1;
+      if (event.eventType === 'add_to_cart') productMap[key].adds += 1;
+    });
+    const topProducts = Object.values(productMap)
+      .map((row) => ({ ...row, conversionRate: rate(row.adds, row.views || 1) }))
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 12);
+
+    const pageMap = {};
+    current.filter((e) => e.eventType === 'page_view').forEach((event) => {
+      const page = event.page || 'index.html';
+      pageMap[page] = (pageMap[page] || 0) + 1;
+    });
+    const topPages = Object.entries(pageMap)
+      .map(([page, total]) => ({ page, total }))
+      .sort((a, b) => b.total - a.total);
+
+    const refMap = {};
+    current.forEach((event) => {
+      const source = referrerLabel(event.referrer);
+      if (!refMap[source]) refMap[source] = new Set();
+      if (event.sessionId) refMap[source].add(event.sessionId);
+    });
+    const referrers = Object.entries(refMap)
+      .map(([source, set]) => ({ source, sessions: set.size }))
+      .sort((a, b) => b.sessions - a.sessions)
+      .slice(0, 8);
+
+    const locMap = {};
+    current.forEach((event) => {
+      if (!event.city && !event.region && !event.country) return;
+      const key = [event.city, event.region, event.country].filter(Boolean).join('|');
+      if (!locMap[key]) locMap[key] = { city: event.city, region: event.region, country: event.country, sessions: new Set() };
+      if (event.sessionId) locMap[key].sessions.add(event.sessionId);
+    });
+    const locations = Object.values(locMap)
+      .map((row) => ({ city: row.city, region: row.region, country: row.country, sessions: row.sessions.size }))
+      .sort((a, b) => b.sessions - a.sessions)
+      .slice(0, 8);
+
+    const insights = [];
+    if (!current.length) {
+      insights.push('Ainda não há visitas registradas neste período. Abra o site neste aparelho para começar a medir.');
+    } else {
+      if (summary.conversionRate < 10 && visitors > 3) insights.push('Poucos visitantes fecham pedido. Vale deixar o checkout mais curto e o WhatsApp mais visível.');
+      if (summary.abandonCheckout >= 40 && beginCheckout > 2) insights.push('Muita gente inicia o checkout e não conclui. Confira se nome, WhatsApp e botão de finalizar estão claros.');
+      if (topProducts[0]) insights.push(`O modelo mais visto foi ${topProducts[0].productName}.`);
+      if (peakCount > 0) insights.push(`O horário com mais movimento foi ${String(peakHour).padStart(2, '0')}h.`);
+      if (referrers[0] && referrers[0].source !== 'Direto') insights.push(`A principal origem de tráfego foi ${referrers[0].source}.`);
+      if (!insights.length) insights.push('O funil está estável neste período. Continue acompanhando os picos de visita.');
+    }
+
+    return {
+      periodLabel: range.label,
+      compareLabel: 'Comparativo com o período anterior',
+      generatedAt: new Date().toISOString(),
+      summary,
+      funnel,
+      insights,
+      byHour,
+      dailyVisits,
+      byWeekday,
+      peakHourLabel: `${String(peakHour).padStart(2, '0')}h`,
+      peakCount,
+      topProducts,
+      topPages,
+      referrers,
+      locations,
+    };
+  }
+
   return {
     init, getAll, save,
     getSettings, saveSettings,
@@ -964,7 +1199,7 @@ const Storage = (() => {
     initCloud, pullFull, pullPublic, pushToCloud, saveAsync,
     isCloudEnabled, wasLoadedFromCache, setAdminPassword, getAdminPassword,
     startCloudPolling, stopCloudPolling, notifyUpdated,
-    createPublicOrder, importSiteOrder, encodeInboxPayload, decodeInboxPayload,
+    createPublicOrder, importSiteOrder, encodeInboxPayload, decodeInboxPayload, getAnalytics,
     getLoyaltyStatus, computeLoyaltyFromOrders, getApiUrl,
     sortProductsList, sortCategoriesList, applyProductSortOrders, applyCategorySortOrders,
     saveCatalogOrderAsync, nextProductSortOrder,

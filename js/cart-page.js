@@ -258,12 +258,14 @@
     }
 
     if (error) error.hidden = true;
+    if (window.GimarryAnalytics) GimarryAnalytics.beginCheckout({ items: Cart.count() });
     Cart.saveCustomer({ nome, sobrenome, phone });
     const fulfillment = Cart.setFulfillment('retirada');
     const fullName = `${nome} ${sobrenome}`;
     if (Cart.saveAsStoreOrder) {
       Cart.saveAsStoreOrder({ fullName, phone, notes: 'Retirada no local' });
     }
+    if (window.GimarryAnalytics) GimarryAnalytics.orderCreated({ items: Cart.count() });
     const message = Cart.buildWhatsAppMessage({ fullName, phone, fulfillment });
     Cart.clear();
     renderAll();
