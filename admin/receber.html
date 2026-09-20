@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Receber pedido — Gimarry</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="login-page">
+  <div class="login" style="place-items:center;padding:32px">
+    <div class="login__form-container" style="max-width:420px;margin:auto">
+      <div class="login__header">
+        <h2 id="inbox-title">Recebendo pedido…</h2>
+        <p id="inbox-text">Abrindo no painel da Gimarry.</p>
+      </div>
+      <a href="index.html" class="login__back" id="inbox-link"><i class="fas fa-arrow-right"></i> Ir ao painel</a>
+    </div>
+  </div>
+  <script src="../js/data.js?v=37"></script>
+  <script src="../js/storage.js?v=4"></script>
+  <script>
+    (function () {
+      const title = document.getElementById('inbox-title');
+      const text = document.getElementById('inbox-text');
+      const payload = Storage.decodeInboxPayload(location.hash || '');
+      if (!payload) {
+        title.textContent = 'Nenhum pedido neste link';
+        text.textContent = 'Abra o link Completo que veio no WhatsApp.';
+        return;
+      }
+      const result = Storage.importSiteOrder(payload);
+      history.replaceState(null, '', location.pathname);
+      if (!result?.ok) {
+        title.textContent = 'Não deu para gravar';
+        text.textContent = result?.error || 'Tente abrir o link de novo.';
+        return;
+      }
+      title.textContent = result.duplicated ? 'Pedido já estava no painel' : 'Pedido no painel';
+      text.textContent = result.order?.number
+        ? `${result.order.number} · ${result.order.clientName}`
+        : 'Abrindo os pedidos.';
+      const logged = sessionStorage.getItem('admin_logged') === 'true';
+      location.replace(logged ? 'index.html' : 'login.html');
+    })();
+  </script>
+</body>
+</html>

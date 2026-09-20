@@ -13,7 +13,41 @@ window.AuroraCart = (() => {
   const listeners = new Set();
 
   function settings() {
-    return (typeof SITE_DATA !== 'undefined' && SITE_DATA.settings) || {};
+    const base = (typeof SITE_DATA !== 'undefined' && SITE_DATA.settings) || {};
+    const extra = (typeof Storage === "object" && Storage.getSettings && Storage.getSettings()) || {};
+    return {
+      ...base,
+      ...extra,
+      brandName: extra.name || extra.brandName || base.brandName,
+      whatsapp: extra.whatsapp || base.whatsapp,
+      address: extra.address || base.address,
+    };
+  }
+
+  function saveAsStoreOrder({ fullName, phone, notes }) {
+    if (typeof Storage !== 'object' || !Storage.createPublicOrder) {
+      return Promise.resolve({ ok: false });
+    }
+    const list = getItems();
+    const itemsPayload = list.map((item) => ({
+      productId: item.productId || item.id || '',
+      name: item.name,
+      qty: Number(item.qty) || 1,
+      price: Number(item.price) || 0,
+      detail: [item.size, item.flavor, item.notes].filter(Boolean).join(' · '),
+      image: item.image || '',
+      size: item.size || '',
+      flavor: item.flavor || '',
+      notes: item.notes || '',
+    }));
+    return Storage.createPublicOrder({
+      fullName,
+      whatsapp: phone,
+      items: itemsPayload,
+      total: payable(),
+      notes: notes || 'Retirada no local',
+      address: '',
+    }).catch(() => ({ ok: false }));
   }
 
   function notify(reason) {
@@ -206,6 +240,38 @@ window.AuroraCart = (() => {
     return `FORMA: Retirada no local\nEndereço: ${address}`;
   }
 
+  function siteRootUrl() {
+    const origin = window.location.origin;
+    const path = String(window.location.pathname || '/').replace(/\\/g, '/');
+    const dir = path.replace(/[^/]+$/, '');
+    const root = dir.replace(/admin\/$/, '');
+    return origin + root;
+  }
+
+  function panelInboxUrl({ fullName, phone, notes }) {
+    if (typeof Storage !== 'object' || !Storage.encodeInboxPayload) return '';
+    const list = getItems();
+    const encoded = Storage.encodeInboxPayload({
+      fullName,
+      phone,
+      items: list.map((item) => ({
+        productId: item.productId || item.id || '',
+        name: item.name,
+        qty: Number(item.qty) || 1,
+        price: Number(item.price) || 0,
+        detail: [item.size, item.flavor, item.notes].filter(Boolean).join(' · '),
+        image: item.image || '',
+        size: item.size || '',
+        flavor: item.flavor || '',
+        notes: item.notes || '',
+      })),
+      total: payable(),
+      notes: notes || 'Retirada no local',
+    });
+    if (!encoded) return '';
+    return `${siteRootUrl()}admin/receber.html#${encoded}`;
+  }
+
   function buildWhatsAppMessage({ fullName, phone, fulfillment }) {
     const storeName = (settings().brandName || 'Gimarry Bolos').toUpperCase();
     const list = getItems();
@@ -222,13 +288,16 @@ window.AuroraCart = (() => {
       return `${qty}x ${item.name}${size}${flavor}${priceBlock}${notes}`;
     }).join('\n\n');
 
+    const inbox = panelInboxUrl({ fullName, phone, notes: 'Retirada no local' });
+
     return (
       `*Novo Pedido — ${storeName}*\n\n` +
       `*Cliente:*\n${fullName}\n${formatPhoneBR(phone)}\n\n` +
       `*Itens:*\n${lines}\n\n` +
       `*Subtotal:* ${formatMoney(subtotalValue)}\n\n` +
       `${fulfillmentBlock(mode)}\n\n` +
-      `Aguardo confirmação`
+      `Aguardo confirmação` +
+      (inbox ? `\n\n*Abrir no painel:*\n${inbox}` : '')
     );
   }
 
@@ -251,6 +320,6 @@ window.AuroraCart = (() => {
     getCoupon, setCoupon,
     loadCustomer, saveCustomer, getFulfillment, setFulfillment,
     getDeliveryFee, getDeliveryNote, formatMoney, formatPhoneBR,
-    buildWhatsAppMessage, syncFromStorage,
+    buildWhatsAppMessage, saveAsStoreOrder, syncFromStorage,
   };
 })();

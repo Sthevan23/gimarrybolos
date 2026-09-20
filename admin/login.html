@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Login — Gimarry Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="admin.css?v=67">
+</head>
+<body class="login-page">
+
+  <div class="login">
+    <div class="login__visual">
+      <div class="login__overlay"></div>
+      <div class="login__visual-content">
+        <i class="fas fa-heart"></i>
+        <h1>Gimarry</h1>
+        <p>Bolo personalizado</p>
+      </div>
+    </div>
+
+    <div class="login__form-wrapper">
+      <div class="login__form-container">
+        <div class="login__header">
+          <h2>Painel Admin</h2>
+          <p>Entre para gerenciar pedidos, produtos e o site</p>
+        </div>
+
+        <form id="login-form" class="login__form">
+          <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> E-mail</label>
+            <input type="email" id="email" value="gimarrybolos@gmail.com" placeholder="gimarrybolos@gmail.com" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="password"><i class="fas fa-lock"></i> Senha</label>
+            <div class="input-password">
+              <input type="password" id="password" placeholder="Digite a senha" required autocomplete="current-password">
+              <button type="button" class="toggle-password" aria-label="Mostrar senha"><i class="fas fa-eye"></i></button>
+            </div>
+          </div>
+          <div class="login__options">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remember" checked> Lembrar-me neste aparelho
+            </label>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full" id="login-btn">
+            <i class="fas fa-sign-in-alt"></i> Entrar no painel
+          </button>
+          <p class="login__error" id="login-error"></p>
+        </form>
+
+        <a href="../index.html" class="login__back"><i class="fas fa-arrow-left"></i> Voltar ao site</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/data.js?v=37"></script>
+  <script src="../js/product-photos.js?v=1"></script>
+  <script src="../js/storage.js?v=4"></script>
+  <script>
+    if (Storage.isAdminLogged && Storage.isAdminLogged()) {
+      window.location.href = 'index.html';
+    }
+
+    document.querySelector('.toggle-password').addEventListener('click', function () {
+      const input = document.getElementById('password');
+      const icon = this.querySelector('i');
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      icon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const remember = document.getElementById('remember')?.checked;
+      const errorEl = document.getElementById('login-error');
+      const btn = document.getElementById('login-btn');
+
+      errorEl.style.display = 'none';
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+
+      try {
+        const result = await Storage.loginAsync(email, password);
+        if (result === true || result?.ok === true) {
+          Storage.markAdminLogged(email, remember);
+          window.location.href = 'index.html';
+          return;
+        }
+        errorEl.textContent = 'E-mail ou senha incorretos.';
+        errorEl.style.display = 'block';
+      } catch (err) {
+        errorEl.textContent = 'Não foi possível entrar. Tente de novo.';
+        errorEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar no painel';
+      }
+    });
+  </script>
+</body>
+</html>

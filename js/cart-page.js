@@ -261,6 +261,9 @@
     Cart.saveCustomer({ nome, sobrenome, phone });
     const fulfillment = Cart.setFulfillment('retirada');
     const fullName = `${nome} ${sobrenome}`;
+    if (Cart.saveAsStoreOrder) {
+      Cart.saveAsStoreOrder({ fullName, phone, notes: 'Retirada no local' });
+    }
     const message = Cart.buildWhatsAppMessage({ fullName, phone, fulfillment });
     Cart.clear();
     renderAll();

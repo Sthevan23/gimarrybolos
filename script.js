@@ -1,5 +1,23 @@
 (() => {
-  const S = SITE_DATA.settings;
+  function liveSettings() {
+    const base = (typeof SITE_DATA !== "undefined" && SITE_DATA.settings) || {};
+    const extra = (typeof Storage === "object" && Storage.getSettings && Storage.getSettings()) || {};
+    return {
+      ...base,
+      ...extra,
+      brandName: extra.name || extra.brandName || base.brandName,
+      brandSub: extra.heroBadge || extra.brandSub || base.brandSub,
+      whatsapp: extra.whatsapp || base.whatsapp,
+      address: extra.address || base.address,
+      instagram: extra.instagram || base.instagram,
+      instagramUser: extra.instagramUser || base.instagramUser,
+      heroImage: extra.heroImage || extra.banner || base.heroImage,
+      aboutImage: extra.sobreImage || extra.aboutImage || base.aboutImage,
+      contactImage: extra.contactImage || extra.sobreImage || extra.aboutImage || base.contactImage,
+      heroWords: Array.isArray(extra.heroWords) && extra.heroWords.length ? extra.heroWords : base.heroWords,
+    };
+  }
+  let S = liveSettings();
 
   const Cart = window.AuroraCart;
   const money = (n) =>
@@ -76,14 +94,31 @@
   let heroWordIndex = 0;
 
   function catalogCategories() {
+    if (typeof Storage === "object" && Storage.getCategories) {
+      const cats = Storage.getCategories()
+        .filter((c) => c.id !== "todos")
+        .map((c) => ({ id: c.id, name: c.name }));
+      return [{ id: "todos", name: "Todos" }, ...cats];
+    }
     return SITE_DATA.categories || [];
   }
 
   function catalogProducts() {
+    if (typeof Storage === "object" && Storage.getProducts) {
+      return Storage.getProducts()
+        .filter((p) => p.active !== false)
+        .map((p) => ({
+          ...p,
+          category: p.category || p.categoryId,
+        }));
+    }
     return SITE_DATA.products || [];
   }
 
   function catalogGallery() {
+    if (typeof Storage === "object" && Storage.getGallery) {
+      return (Storage.getGallery() || []).slice(0, GALLERY_LIMIT);
+    }
     return (SITE_DATA.gallery || []).slice(0, GALLERY_LIMIT);
   }
 
@@ -1175,6 +1210,13 @@
 
     Cart.saveCustomer({ nome, sobrenome, phone });
     Cart.setFulfillment(fulfillment);
+    if (Cart.saveAsStoreOrder) {
+      Cart.saveAsStoreOrder({
+        fullName: `${nome} ${sobrenome}`,
+        phone,
+        notes: "Retirada no local",
+      });
+    }
     const msg = Cart.buildWhatsAppMessage({
       fullName: `${nome} ${sobrenome}`,
       phone,
@@ -1423,6 +1465,7 @@
 
   /* ---------- init ---------- */
   function boot() {
+    S = liveSettings();
     hydrateBrand();
     buildMarquee();
     rotateHeroWords();
@@ -1433,6 +1476,14 @@
     setupContact();
     setupChrome();
   }
+
+  window.addEventListener("storage-updated", () => {
+    S = liveSettings();
+    hydrateBrand();
+    renderFilters();
+    renderProducts();
+    renderGallery();
+  });
 
   boot();
 })();
